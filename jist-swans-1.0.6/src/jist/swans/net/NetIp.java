@@ -72,7 +72,7 @@ public class NetIp implements NetInterface
   /**
    * Maximum packet queue length.
    */
-  public static final byte MAX_QUEUE_LENGTH = 50;
+  public static final int MAX_QUEUE_LENGTH = 1000;
 
   //////////////////////////////////////////////////
   // locals

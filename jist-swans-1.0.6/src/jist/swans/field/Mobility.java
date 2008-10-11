@@ -88,7 +88,7 @@ public interface Mobility
 		}
 		public UniformCircularInfo(double k1,double k2,double n){
 			direction = 2*Math.PI*Constants.random.nextDouble();
-			velocity = k1/Math.sqrt(n);
+			velocity = k1/Math.sqrt(n);  
 			m1 = k2/n;
 			distance = Constants.exprnd(m1);
 			// System.out.println("costrutor");
@@ -238,19 +238,23 @@ public interface Mobility
 		public double direction;
 		public double distance;
 		public double velocity;
+		public double velocityMax;
+		public double velocityMin;
 		private double m1;
 		public UniformRectagularInfo(){
 
 		}
-		public UniformRectagularInfo(double k1,double k2,int n){
+		public UniformRectagularInfo(double Vmin,double Vmax,double k2,int n){
 			direction = 2*Math.PI*Constants.random.nextDouble();
-			velocity = k1/Math.sqrt(n);
+			velocity =  velocityMin + (velocityMax -velocityMin)*Constants.random.nextDouble(); // speedmin+(speedmax - speedmin)*rand
+			
 			m1 = k2/n;
 			distance = Constants.exprnd(m1);
 		}
 		public void renew(){
 			direction = 2*Math.PI*Constants.random.nextDouble();
 			distance = Constants.exprnd(m1);
+			velocity =  velocityMin + (velocityMax -velocityMin)*Constants.random.nextDouble();
 		}
 
 
@@ -258,21 +262,22 @@ public interface Mobility
 	public static class UniformRectagular implements Mobility
 	{
 
-		private double k1,k2;
+		private double Vmax,Vmin,k2;
 		private int n;
 		private Location.Location2D bounds;
 		public UniformRectagular(Location.Location2D bounds,String config, int n){
 			String ksConfigOptions [];
 			ksConfigOptions= config.split(":");
-			k1 = Double.parseDouble(ksConfigOptions[0]);
-			k2 =Double.parseDouble(ksConfigOptions[1]);
+			Vmin = Double.parseDouble(ksConfigOptions[0]);
+			Vmax = Double.parseDouble(ksConfigOptions[1]);
+			k2 =Double.parseDouble(ksConfigOptions[2]);
 			this.n = n;
 			this.bounds = bounds;
 		}
 
 		public MobilityInfo init(FieldInterface f, Integer id, Location loc) {
 
-			return new UniformRectagularInfo(k1,k2,n);
+			return new UniformRectagularInfo(Vmin,Vmax,k2,n);
 		}
 
 		public void next(FieldInterface f, Integer id, Location loc, MobilityInfo info) {
