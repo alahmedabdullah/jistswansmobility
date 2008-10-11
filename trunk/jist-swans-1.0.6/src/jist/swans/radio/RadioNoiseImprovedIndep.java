@@ -183,4 +183,10 @@ public final class RadioNoiseImprovedIndep extends RadioNoise
     }
   }
 
+public void setThresholdSNR(double limiteSNR) {
+	// TODO Auto-generated method stub
+	this.thresholdSNR = limiteSNR;
+	
+}
+
 } // class: RadioNoiseImprovedInde
