@@ -143,17 +143,17 @@ public interface MessageQueue
     /**
      * Index of highest priority.
      */
-    private byte topPri;
+    private int topPri;
 
     /**
      * Length of list.
      */
-    private byte size;
+    private int size;
 
     /**
      * List size limit.
      */
-    private byte capacity;
+    private int capacity;
     
     /** trace object for this Network Interface. */
    
@@ -165,11 +165,11 @@ public interface MessageQueue
      * @param priorities number of priority levels
      * @param capacity maximum number of items allowed in list
      */
-    public NoDropMessageQueue(byte priorities, byte capacity)
+    public NoDropMessageQueue(int priorities, int capacity)
     {
       heads = new QueuedMessage[priorities];
       tails = new QueuedMessage[priorities];
-      topPri = (byte)heads.length;
+      topPri = heads.length;
       size = 0;
       this.capacity = capacity;
     }
