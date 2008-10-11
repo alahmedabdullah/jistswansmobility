@@ -40,7 +40,10 @@ import jist.runtime.JistAPI;
 
 import jargs.gnu.*;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Date;
 import java.util.Random;
 import java.util.Vector;
@@ -61,6 +64,7 @@ public class aodvsim
   //////////////////////////////////////////////////
   // command-line options
   //
+private static PrintStream statsfile;
 
   /** Simulation parameters with default values. */
   private static class CommandLineOptions
@@ -107,6 +111,7 @@ public class aodvsim
     public int spatial_div = 5;
     
     private double limiteSNR = 10;
+    
     
     
   } // class: CommandLineOptions
@@ -302,6 +307,7 @@ public class aodvsim
         {
           cmdOpts.loss = Constants.NET_LOSS_NONE;
         }
+        
         else if(lossString.equalsIgnoreCase("uniform"))
         {
           cmdOpts.loss = Constants.NET_LOSS_UNIFORM;
@@ -392,7 +398,7 @@ public class aodvsim
       PacketLoss inLoss, PacketLoss outLoss)
   {
     // radio
-	  RadioNoiseIndep r = new RadioNoiseIndep(i, radioInfo);
+	  RadioNoiseImprovedIndep r = new RadioNoiseImprovedIndep(i, radioInfo);
 	 r.setThresholdSNR(opts.limiteSNR);
     RadioNoise radio =r; 
     
@@ -562,6 +568,28 @@ public class aodvsim
     {
     	//JAVIS -GUI SUPPORT
     	JavisTrace.createTraceSetTrace(field,"aodvsim_"+opts.nodes+"_"+mobilityString+"Snr_"+opts.limiteSNR+"_NodeSim");
+    	
+    	
+    	FileOutputStream out; // declare a file output object
+        // declare a print stream object
+
+     
+                // Create a new file output stream
+                // connected to "myfile.txt"
+                try {
+					out = new FileOutputStream("aodvsim_"+opts.nodes+"_"+mobilityString+"Snr_"+opts.limiteSNR+"_NodeSim_stats_Aodv");
+					statsfile = new PrintStream( out );
+
+                } catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+                // Connect print stream to the output stream
+               
+                
+     
+    	
     	//END OF CODE -for JAVIS GUI SUPPORT
    
     }
@@ -588,7 +616,7 @@ public class aodvsim
     // set up message sending events
     JistAPI.sleep(opts.startTime*Constants.SECOND);
     //System.out.println("clear stats at t="+JistAPI.getTimeString());
-    stats.clear();
+    stats.clear();//1300/6
     int numTotalMessages = (int)Math.floor(((double)opts.sendRate/60) * opts.nodes * opts.duration);
     long delayInterval = (long)Math.ceil((double)opts.duration * (double)Constants.SECOND / (double)numTotalMessages);
     for(int i=0; i<numTotalMessages; i++)
@@ -633,49 +661,87 @@ public class aodvsim
   {
     Date endTime = new Date();
     long elapsedTime = endTime.getTime() - startTime.getTime();
+    FileOutputStream out; // declare a file output object
+    // declare a print stream object
+
+    
+
+    
     
     System.err.println("-------------");   
+    statsfile.println("-------------");
     System.err.println("Packet stats:");
+    statsfile.println("Packet stats:");
     System.err.println("-------------");
+    statsfile.println("-------------");
     
     System.err.println("Rreq packets sent = "+stats.send.rreqPackets);
+    statsfile.println("Rreq packets sent = "+stats.send.rreqPackets);
     System.err.println("Rreq packets recv = "+stats.recv.rreqPackets);
+    statsfile.println("Rreq packets recv = "+stats.recv.rreqPackets);
     
     System.err.println("Rrep packets sent = "+stats.send.rrepPackets);
+    statsfile.println("Rrep packets sent = "+stats.send.rrepPackets);
     System.err.println("Rrep packets recv = "+stats.recv.rrepPackets);
+    statsfile.println("Rrep packets recv = "+stats.recv.rrepPackets);
    
     System.err.println("Rerr packets sent = "+stats.send.rerrPackets);
+    statsfile.println("Rerr packets sent = "+stats.send.rerrPackets);
     System.err.println("Rerr packets recv = "+stats.recv.rerrPackets);
+    statsfile.println("Rerr packets recv = "+stats.recv.rerrPackets);
     
     System.err.println("Hello packets sent = "+stats.send.helloPackets);
+    statsfile.println("Hello packets sent = "+stats.send.helloPackets);
     System.err.println("Hello packets recv = "+stats.recv.helloPackets);
+    statsfile.println("Hello packets recv = "+stats.recv.helloPackets);
     
     System.err.println("Total aodv packets sent = "+stats.send.aodvPackets);
+    statsfile.println("Total aodv packets sent = "+stats.send.aodvPackets);
     System.err.println("Total aodv packets recv = "+stats.recv.aodvPackets);
-
+    statsfile.println("Total aodv packets recv = "+stats.recv.aodvPackets);
+    
+    
     System.err.println("Non-hello packets sent = "+(stats.send.aodvPackets - stats.send.helloPackets));
+    statsfile.println("Non-hello packets sent = "+(stats.send.aodvPackets - stats.send.helloPackets));
     System.err.println("Non-hello packets recv = "+(stats.recv.aodvPackets - stats.recv.helloPackets));
+    statsfile.println("Non-hello packets recv = "+(stats.recv.aodvPackets - stats.recv.helloPackets));
     
     System.err.println("--------------");
+    statsfile.println("--------------");
     System.err.println("Overall stats:");
+    statsfile.println("Overall stats:");
     System.err.println("--------------");
+    statsfile.println("--------------");
     System.err.println("Messages to deliver = "+stats.netMsgs);
+    statsfile.println("Messages to deliver = "+stats.netMsgs);
     System.err.println("Route requests      = "+stats.rreqOrig);
+    statsfile.println("Route requests      = "+stats.rreqOrig);
     System.err.println("Route replies       = "+stats.rrepOrig);
+    statsfile.println("Route replies       = "+stats.rrepOrig);
     System.err.println("Routes added        = "+stats.rreqSucc);
+    statsfile.println("Routes added        = "+stats.rreqSucc);
     
     System.err.println();
+    statsfile.println();
     System.gc();
     System.err.println("freemem:  "+Runtime.getRuntime().freeMemory());
+    statsfile.println("freemem:  "+Runtime.getRuntime().freeMemory());
     System.err.println("maxmem:   "+Runtime.getRuntime().maxMemory());
+    statsfile.println("maxmem:   "+Runtime.getRuntime().maxMemory());
     System.err.println("totalmem: "+Runtime.getRuntime().totalMemory());
+    statsfile.println("totalmem: "+Runtime.getRuntime().totalMemory());
     long usedMem = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
     System.err.println("used:     "+usedMem);
+    statsfile.println("used:     "+usedMem);
 
     System.err.println("start time  : "+startTime);
+    statsfile.println("start time  : "+startTime);
     System.err.println("end time    : "+endTime);
+    statsfile.println("end time    : "+endTime);
     System.err.println("elapsed time: "+elapsedTime);
+    statsfile.println("elapsed time: "+elapsedTime);
     System.err.flush();
+    statsfile.flush();
 
     System.out.println(opt.nodes+"\t"
       +stats.send.rreqPackets+"\t"
@@ -692,16 +758,34 @@ public class aodvsim
       +(stats.recv.aodvPackets - stats.recv.helloPackets)+"\t"
       +usedMem+"\t"
       +elapsedTime);
+    
+    statsfile.println(opt.nodes+"\t"
+    	      +stats.send.rreqPackets+"\t"
+    	      +stats.recv.rreqPackets+"\t"
+    	      +stats.send.rrepPackets+"\t"
+    	      +stats.recv.rrepPackets+"\t"
+    	      +stats.send.rerrPackets+"\t"
+    	      +stats.recv.rerrPackets+"\t"
+    	      +stats.send.helloPackets+"\t"
+    	      +stats.recv.helloPackets+"\t"
+    	      +stats.send.aodvPackets+"\t"
+    	      +stats.recv.aodvPackets+"\t"
+    	      +(stats.send.aodvPackets - stats.send.helloPackets)+"\t"
+    	      +(stats.recv.aodvPackets - stats.recv.helloPackets)+"\t"
+    	      +usedMem+"\t"
+    	      +elapsedTime);
         
     //clear memory
     routers = null;
     stats = null;
     
-    System.out.println("Average density = " +
-    		field.computeDensity()  + "/m^2");
+    System.out.println("Average density = " + field.computeDensity()  + "/m^2");
+    statsfile.println("Average density = " + field.computeDensity()  + "/m^2");
     System.out.println("Average sensing = " + field.computeAvgConnectivity(true));
+    statsfile.println("Average sensing = " + field.computeAvgConnectivity(true));
     System.out.println("Average receive = " + field.computeAvgConnectivity(false));
-
+    statsfile.println("Average receive = " + field.computeAvgConnectivity(false));
+    statsfile.close();
   }
 
   /**
