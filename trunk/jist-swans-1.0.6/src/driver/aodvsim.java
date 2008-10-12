@@ -92,7 +92,7 @@ private static PrintStream statsfile;
     /** Packet loss model. */
     private int loss = Constants.NET_LOSS_NONE;
     /** Packet loss options. */
-    private String lossOpts = "";
+    private String lossOpts = "0.2";
     /** Number of messages sent per minute per node. */
     private double sendRate = 10.0;
     /** Start of sending (seconds). */
