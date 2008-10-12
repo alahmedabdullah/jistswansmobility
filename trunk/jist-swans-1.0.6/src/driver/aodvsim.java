@@ -102,7 +102,7 @@ private static PrintStream statsfile;
     /** Number of seconds after messages stop sending to end simulation. */
     private int resolutionTime = 30; 
     /** Random seed. */
-    private int seed = 0;
+    private long seed = System.currentTimeMillis();
     /** Gui Support */
     private boolean guisupport = false;
     /** binning mode. */
@@ -808,8 +808,8 @@ private static PrintStream statsfile;
       {
         JistAPI.endAt(endTime*Constants.SECOND);
       }
-      //Constants.random = new Random(options.seed);
-      Constants.random = new Random();
+      Constants.random = new Random(options.seed);
+     // Constants.random = new Random();
       final Vector routers = new Vector();
       final RouteAodv.AodvStats stats = new RouteAodv.AodvStats();
       final Date startTime = new Date();
