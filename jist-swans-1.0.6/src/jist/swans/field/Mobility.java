@@ -237,6 +237,9 @@ public interface Mobility
 	{
 		public double direction;
 		public double distance;
+		public double distanceCurr;
+		public int steps;
+		public double stepTime;
 		public double velocity;
 		public double velocityMax;
 		public double velocityMin;
@@ -244,17 +247,31 @@ public interface Mobility
 		public UniformRectagularInfo(){
 
 		}
-		public UniformRectagularInfo(double Vmin,double Vmax,double k2,int n){
+		public UniformRectagularInfo(double Vmin,double Vmax,double k2,int steps,int n){
+			velocityMin =Vmin;
+			velocityMax = Vmax;
+			this.steps=steps;
 			direction = 2*Math.PI*Constants.random.nextDouble();
 			velocity =  velocityMin + (velocityMax -velocityMin)*Constants.random.nextDouble(); // speedmin+(speedmax - speedmin)*rand
 			
 			m1 = k2/n;
 			distance = Constants.exprnd(m1);
+			distanceCurr = distance;
+			
+			double timeTotal = distance/velocity;
+			this.stepTime = timeTotal/steps;
+			
+			
+			
+			
 		}
 		public void renew(){
 			direction = 2*Math.PI*Constants.random.nextDouble();
 			distance = Constants.exprnd(m1);
+			distanceCurr = distance;
 			velocity =  velocityMin + (velocityMax -velocityMin)*Constants.random.nextDouble();
+			double timeTotal = distance/velocity;
+			this.stepTime = timeTotal/steps;
 		}
 
 
@@ -263,7 +280,7 @@ public interface Mobility
 	{
 
 		private double Vmax,Vmin,k2;
-		private int n;
+		private int n,steps;
 		private Location.Location2D bounds;
 		public UniformRectagular(Location.Location2D bounds,String config, int n){
 			String ksConfigOptions [];
@@ -271,20 +288,22 @@ public interface Mobility
 			Vmin = Double.parseDouble(ksConfigOptions[0]);
 			Vmax = Double.parseDouble(ksConfigOptions[1]);
 			k2 =Double.parseDouble(ksConfigOptions[2]);
+			steps =Integer.parseInt(ksConfigOptions[3]);
 			this.n = n;
 			this.bounds = bounds;
 		}
 
 		public MobilityInfo init(FieldInterface f, Integer id, Location loc) {
 
-			return new UniformRectagularInfo(Vmin,Vmax,k2,n);
+			return new UniformRectagularInfo(Vmin,Vmax,k2,steps,n);
 		}
 
 		public void next(FieldInterface f, Integer id, Location loc, MobilityInfo info) {
 			UniformRectagularInfo uinfo = (UniformRectagularInfo)info;
 			//Location locAnterior = loc;
-			double newX = loc.getX()+ uinfo.velocity*Math.cos(uinfo.direction);
-			double newY = loc.getY()+ uinfo.velocity*Math.sin(uinfo.direction);
+			double stepDist = uinfo.velocity*uinfo.stepTime;
+			double newX = loc.getX()+ stepDist*Math.cos(uinfo.direction);
+			double newY = loc.getY()+ stepDist*Math.sin(uinfo.direction);
 			while(newX<0 || newX>bounds.getX() || newY<0 || newY>bounds.getY()){
 				double deltaXExt = newX-loc.getX();
 				double deltaYExt = newY-loc.getY();
@@ -374,16 +393,19 @@ public interface Mobility
 
 
 			}
-			uinfo.distance -= uinfo.velocity;
+			uinfo.distanceCurr -= stepDist;
+			if (uinfo.distanceCurr<0.0001 && uinfo.distanceCurr>-0.0001)
+				uinfo.distanceCurr = 0;
 			Location2D newLoc = new Location2D((float)newX,(float)newY);
 			/*if(id==1 )
 		  {
 			  System.out.println(id+"\t"+newLoc.getX()+"\t"+newLoc.getY());
 
 		  }*/
-			JistAPI.sleep(1*Constants.SECOND);
+			JistAPI.sleep((long)uinfo.stepTime*Constants.SECOND);
+			
 			f.moveRadio(id,newLoc);
-			if(uinfo.distance<0){
+			if(uinfo.distanceCurr<=0){
 				uinfo.renew();
 			}
 
