@@ -239,6 +239,7 @@ public interface Mobility
 		public double distance;
 		public double distanceCurr;
 		public int steps;
+		public int stepsCurr;
 		public double stepTime;
 		public double velocity;
 		public double velocityMax;
@@ -259,9 +260,8 @@ public interface Mobility
 			distanceCurr = distance;
 			
 			double timeTotal = distance/velocity;
-			this.stepTime = timeTotal/steps;
-			
-			
+			this.stepTime =timeTotal/steps;
+			stepsCurr = steps;
 			
 			
 		}
@@ -271,7 +271,8 @@ public interface Mobility
 			distanceCurr = distance;
 			velocity =  velocityMin + (velocityMax -velocityMin)*Constants.random.nextDouble();
 			double timeTotal = distance/velocity;
-			this.stepTime = timeTotal/steps;
+			this.stepTime = (timeTotal/steps);
+			stepsCurr = steps;
 		}
 
 
@@ -393,19 +394,18 @@ public interface Mobility
 
 
 			}
-			uinfo.distanceCurr -= stepDist;
-			if (uinfo.distanceCurr<0.0001 && uinfo.distanceCurr>-0.0001)
-				uinfo.distanceCurr = 0;
+			uinfo.stepsCurr--;
 			Location2D newLoc = new Location2D((float)newX,(float)newY);
-			/*if(id==1 )
-		  {
-			  System.out.println(id+"\t"+newLoc.getX()+"\t"+newLoc.getY());
-
-		  }*/
-			JistAPI.sleep((long)uinfo.stepTime*Constants.SECOND);
+//			if(id==1 )
+//		  {
+//				System.err.println((long)(uinfo.stepTime*Constants.SECOND));
+//		  }
+////			long t=(long)uinfo.stepTime*Constants.SECOND;
+////			if(t!=0)
+			JistAPI.sleep((long)(uinfo.stepTime*Constants.SECOND));
 			
 			f.moveRadio(id,newLoc);
-			if(uinfo.distanceCurr<=0){
+			if(uinfo.stepsCurr<=0){
 				uinfo.renew();
 			}
 

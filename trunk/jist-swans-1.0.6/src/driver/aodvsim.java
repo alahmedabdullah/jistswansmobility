@@ -515,7 +515,7 @@ private static PrintStream statsfile;
     }
     if(opts.wrapField) spatial = new Spatial.TiledWraparound(spatial);
     // initialize field
-    Field field = new Field(spatial, new Fading.None(), new PathLoss.FreeSpace(), 
+    Field field = new Field(spatial, new Fading.Rayleigh(), new PathLoss.TwoRay(), 
         mobility, Constants.PROPAGATION_LIMIT_DEFAULT);
     // initialize shared radio information
     RadioInfo.RadioInfoShared radioInfo = RadioInfo.createShared(
@@ -814,6 +814,7 @@ private static PrintStream statsfile;
       final RouteAodv.AodvStats stats = new RouteAodv.AodvStats();
       final Date startTime = new Date();
       final Field field = buildField(options, routers, stats);
+      
       
       
       JistAPI.runAt(new Runnable()
