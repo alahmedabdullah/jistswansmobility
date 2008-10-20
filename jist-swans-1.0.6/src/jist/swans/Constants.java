@@ -31,7 +31,8 @@ public final class Constants
   //
 
   /** Global random number generator. */
-  public static Random random = new Random(0);
+  public static Random random = new Random(System.currentTimeMillis());
+  
   public static BetaGen betaUniform;
   private static ExponentialGen esponencial;
   private static RandomStream stream = new LFSR113();

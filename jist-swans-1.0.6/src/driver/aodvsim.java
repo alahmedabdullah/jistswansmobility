@@ -78,7 +78,7 @@ private static PrintStream statsfile;
     /** Number of nodes. */
     private int nodes = 100;
     /** Field dimensions (in meters). */
-    private Location.Location2D field = new Location.Location2D(1000, 1000);
+    private Location.Location2D field = new Location.Location2D(1500, 300);
     /** Field wrap-around. */
     private boolean wrapField = false;
     /** Node placement model. */
@@ -94,19 +94,19 @@ private static PrintStream statsfile;
     /** Packet loss options. */
     private String lossOpts = "0.2";
     /** Number of messages sent per minute per node. */
-    private double sendRate = 10.0;
+    private double sendRate = 4*60.0;
     /** Start of sending (seconds). */
-    private int startTime = 60;
+    private int startTime = 10;
     /** Number of seconds to send messages. */
-    private int duration = 3600;
+    private int duration = 900;
     /** Number of seconds after messages stop sending to end simulation. */
-    private int resolutionTime = 30; 
+    private int resolutionTime = 10; 
     /** Random seed. */
     private long seed = System.currentTimeMillis();
     /** Gui Support */
     private boolean guisupport = false;
     /** binning mode. */
-    public int spatial_mode = Constants.SPATIAL_HIER;
+    public int spatial_mode = Constants.SPATIAL_LINEAR;
     /** binning degree. */
     public int spatial_div = 5;
     
@@ -632,7 +632,7 @@ private static PrintStream statsfile;
       RouteAodv srcAodv = (RouteAodv)routers.elementAt(srcIdx);
       RouteAodv destAodv = (RouteAodv)routers.elementAt(destIdx);
       
-      Message m = new MessageBytes(new byte[1024]);
+      Message m = new MessageBytes(new byte[64]);
       
       TransUdp.UdpMessage udpMsg = new TransUdp.UdpMessage(PORT, PORT, m);
       

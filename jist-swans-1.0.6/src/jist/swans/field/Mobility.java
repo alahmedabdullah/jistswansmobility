@@ -76,6 +76,101 @@ public interface Mobility
 	//////////////////////////////////////////////////
 	// uniform mobility model
 	//
+	public static class GaussMarkovInfo implements MobilityInfo{
+		public double speed;
+		public double direction;
+		public double direction_medio;
+		
+		public GaussMarkovInfo(double speed,double direction,double d_){
+			this.speed = speed;
+			this.direction = direction;
+			direction_medio = d_;
+			
+		}
+		
+	}
+	
+	public static class GaussMarkov implements Mobility{
+
+		public double direction_medio;
+		private double speed_medio;
+		private double borda;
+		private double maxSpeed;
+		private double minSpeed;
+		private double alpha;
+		private Location field;
+		private double limiteXsup;
+		private double limiteYsup;
+		private double limiteXinf;
+		private double limiteYinf;
+		
+		public GaussMarkov(Location field, String config){
+			this.field = field;
+			String GaussMarkovConfigOptions [];
+			GaussMarkovConfigOptions= config.split(":");
+			minSpeed = Double.parseDouble(GaussMarkovConfigOptions[0]);
+			maxSpeed =Double.parseDouble(GaussMarkovConfigOptions[1]);
+			speed_medio = Double.parseDouble(GaussMarkovConfigOptions[2]);
+			direction_medio =Double.parseDouble(GaussMarkovConfigOptions[3]);
+			alpha =Double.parseDouble(GaussMarkovConfigOptions[4]);
+			borda =Double.parseDouble(GaussMarkovConfigOptions[5]);
+			limiteXinf = borda*field.getX();
+			limiteYinf = borda*field.getY();
+			limiteXsup = field.getX() - borda*field.getX();
+			limiteYsup = field.getY() - borda*field.getY();
+		}
+		public MobilityInfo init(FieldInterface f, Integer id, Location loc) {
+			double speed = minSpeed + (maxSpeed-minSpeed)*Constants.random.nextDouble();
+			double direction = 2*Math.PI*Constants.random.nextDouble();		
+			return new GaussMarkovInfo(speed,direction,direction_medio);
+		}
+
+		public void next(FieldInterface f, Integer id, Location loc, MobilityInfo info) {
+			double x = loc.getX();
+			double y = loc.getY();
+			GaussMarkovInfo gminfo = (GaussMarkovInfo)info;
+			double direction_medio = gminfo.direction_medio;
+			double X=field.getX(),Y=field.getY();
+			if (x > 0 && x < limiteXinf && y > 0 && y < limiteYinf)
+				direction_medio = Math.PI/4;
+			else if (x > limiteXinf && x < limiteXsup && x > 0 && y < limiteYinf)
+				direction_medio = Math.PI/2;
+			else if (x > limiteXsup && x < X && y > 0 && y < limiteYinf)
+				direction_medio = 3*Math.PI/4;
+			else if (x > limiteXsup && x < X && y > limiteYinf  && y < limiteYsup)
+				direction_medio = Math.PI;
+			else if (x > limiteXsup && x < X && y > limiteYsup  && y < Y)
+				direction_medio = 5*Math.PI/4;
+			else if (x > limiteXinf && x < limiteXsup && y > limiteYsup  && y < Y)
+				direction_medio = 3*Math.PI/2;
+			else if (x > 0 && x < limiteXinf && y > limiteYsup  && y < Y)
+				direction_medio =7*Math.PI/4;
+			else if (x > 0 && x < limiteXinf && y > limiteYinf  && y< limiteYsup)
+				direction_medio = 0;
+			else
+				direction_medio = gminfo.direction_medio;
+			gminfo.direction_medio = direction_medio;
+			double speed_old = gminfo.speed;
+	        double direction_old = gminfo.direction;
+	        double s_ = speed_medio;
+	        double d_ = gminfo.direction_medio;
+	        double speed_new = alpha*speed_old + (1-alpha)*s_ + Math.sqrt(Math.pow(1-alpha,2))*Constants.random.nextGaussian();
+	        double direction_new =alpha*direction_old + (1-alpha)*d_ + Math.sqrt(Math.pow(1-direction_old,2))*Constants.random.nextGaussian();
+	        
+	        double x_old = loc.getX();
+	        double y_old = loc.getY();
+	        double s_old = gminfo.speed;
+	        double d_old = gminfo.direction;
+	        double x_new = x_old + s_old*Math.cos(d_old);
+	        double y_new = y_old + s_old*Math.sin(d_old);
+	        gminfo.direction = direction_new;
+	        gminfo.speed =speed_new;
+	        JistAPI.sleep(1*Constants.SECOND);	        
+	        f.moveRadio(id, new Location.Location2D((float)x_new,(float)y_new));
+		}
+
+	}
+
 	public static class UniformCircularInfo implements MobilityInfo
 	{
 
