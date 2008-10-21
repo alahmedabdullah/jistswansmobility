@@ -4,7 +4,8 @@
  */
 package guiTrace;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Date;
 import java.util.zip.GZIPOutputStream;
 
@@ -30,10 +31,10 @@ public class JavisTrace extends Trace  implements JistAPI.DoNotRewrite{
     public JavisTrace(String filename) throws IOException {
       super();
       if (filename.endsWith(".gz")){
-          m_writer=new java.io.BufferedWriter(new java.io.OutputStreamWriter(
+          m_writer=new java.io.BufferedWriter(new OutputStreamWriter(
 	         new GZIPOutputStream(new java.io.FileOutputStream(filename))));
       } else {
-          m_writer=new java.io.BufferedWriter(new java.io.OutputStreamWriter(
+          m_writer=new java.io.BufferedWriter(new OutputStreamWriter(
 	         new java.io.FileOutputStream(filename)));
       }
       
