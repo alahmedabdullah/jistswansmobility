@@ -282,6 +282,10 @@ private static PrintStream statsfile;
         {
           cmdOpts.mobility = Constants.MOBILITY_DIRECTION;
         }
+        else if(mobilityString.equalsIgnoreCase("gauss_markov"))
+        {
+          cmdOpts.mobility = Constants.MOBILITY_GAUSS_MARKOV;
+        }
         else if(mobilityString.equalsIgnoreCase("boundless"))
         {
         	if(cmdOpts.wrapField==false)
@@ -492,6 +496,9 @@ private static PrintStream statsfile;
           break;
       case Constants.MOBILITY_BOUNDLESS_SIM_AREA:
           mobility = new Mobility.BoundlessSimulationArea(opts.field, opts.mobilityOpts);
+          break;
+      case Constants.MOBILITY_GAUSS_MARKOV:
+          mobility = new Mobility.GaussMarkov(opts.field, opts.mobilityOpts);
           break;
       
       default:

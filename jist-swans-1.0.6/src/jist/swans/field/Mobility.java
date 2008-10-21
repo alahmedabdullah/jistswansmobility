@@ -118,6 +118,7 @@ public interface Mobility
 			limiteYinf = borda*field.getY();
 			limiteXsup = field.getX() - borda*field.getX();
 			limiteYsup = field.getY() - borda*field.getY();
+			
 		}
 		public MobilityInfo init(FieldInterface f, Integer id, Location loc) {
 			double speed = minSpeed + (maxSpeed-minSpeed)*Constants.random.nextDouble();
@@ -163,10 +164,14 @@ public interface Mobility
 	        double d_old = gminfo.direction;
 	        double x_new = x_old + s_old*Math.cos(d_old);
 	        double y_new = y_old + s_old*Math.sin(d_old);
+	        double dist = Math.sqrt(Math.pow(x_old-x_new, 2)+Math.pow(y_old-y_new, 2));
+	        double stepTime = dist/gminfo.speed;
 	        gminfo.direction = direction_new;
 	        gminfo.speed =speed_new;
-	        JistAPI.sleep(1*Constants.SECOND);	        
-	        f.moveRadio(id, new Location.Location2D((float)x_new,(float)y_new));
+	        JistAPI.sleep((long)(stepTime*Constants.SECOND));	        
+	        Location newloc = new Location.Location2D((float)x_new,(float)y_new);
+	        //if(newloc.inside(new Location.Location2D(0,0) ,new Location.Location2D(field.getX(),field.getY())))
+	        f.moveRadio(id, newloc);
 		}
 
 	}
@@ -332,7 +337,7 @@ public interface Mobility
 	{
 		public double direction;
 		public double distance;
-		public double distanceCurr;
+		//public double distanceCurr;
 		public int steps;
 		public int stepsCurr;
 		public double stepTime;
@@ -352,7 +357,7 @@ public interface Mobility
 			
 			m1 = k2/n;
 			distance = Constants.exprnd(m1);
-			distanceCurr = distance;
+		//	distanceCurr = distance;
 			
 			double timeTotal = distance/velocity;
 			this.stepTime =timeTotal/steps;
@@ -363,7 +368,7 @@ public interface Mobility
 		public void renew(){
 			direction = 2*Math.PI*Constants.random.nextDouble();
 			distance = Constants.exprnd(m1);
-			distanceCurr = distance;
+		//	distanceCurr = distance;
 			velocity =  velocityMin + (velocityMax -velocityMin)*Constants.random.nextDouble();
 			double timeTotal = distance/velocity;
 			this.stepTime = (timeTotal/steps);
@@ -741,40 +746,41 @@ public interface Mobility
 		public double direction;
 		public double distance;
 		public double velocity;
+		private double Vmin,Vmax;
+		private int steps;
+		public int stepsCurr;
+		public double stepTime;
 		public Location loc;
 		public boolean ishead=false;
 		public int tipo = 3;
 		public ArrayList<Integer> nodesInternos=new ArrayList<Integer>();;
-		private double m1;
+		private double mu;
 
-		public NomadicRectgularInfo(double k1,double k2,int n,boolean ishead){
-			direction = 2*Math.PI*Constants.random.nextDouble();
-
-			m1 = k2/n;
+		public NomadicRectgularInfo(double Vmin, double Vmax,double k2,int n,boolean ishead,int steps){
+			
+			this.Vmin = Vmin;
+			this.Vmax = Vmax;
+			mu = k2/n;
+			this.steps = steps;
+			stepsCurr = steps;
 			this.ishead = ishead;
-			distance = Constants.exprnd(m1);
-			if(this.ishead)
-				velocity = 10*k1/Math.sqrt(n);
-			else
-				velocity = 0.1*k1/Math.sqrt(n);
+			direction = 2*Math.PI*Constants.random.nextDouble();
+			distance = Constants.exprnd(mu);
+			velocity = Vmin + (Vmax - Vmin)*Constants.random.nextDouble(); // speedmin+(speedmax - speedmin)*rand
+			double timeTotal = distance/velocity;
+			this.stepTime =timeTotal/steps;	
 		}
 		public NomadicRectgularInfo(){
 
 		}
 		public void renew(){
 			direction = 2*Math.PI*Constants.random.nextDouble();
-			distance = Constants.exprnd(m1);
+			distance = Constants.exprnd(mu);
+			velocity = Vmin + (Vmax - Vmin)*Constants.random.nextDouble(); // speedmin+(speedmax - speedmin)*rand
+			double timeTotal = distance/velocity;
+			this.stepTime =timeTotal/steps;	
+			stepsCurr=steps;
 		}
-		public NomadicRectgularInfo clone(){
-			NomadicRectgularInfo info = new NomadicRectgularInfo();
-			info.direction = this.direction;
-			info.distance = this.distance;
-			info.velocity = this.velocity;
-			info.m1 = this.m1;
-			return info;
-
-		}
-
 	}
 
 
@@ -783,9 +789,11 @@ public interface Mobility
 		private static int qtdpointReference;
 		private static int jaqtdpointReference=0;
 		private NomadicRectgularInfo []heads ;
+		private static double Vmax,Vmin;
 		private int pauseTime;
-		private double k1,k2;
-		private int n;
+		private int steps;
+		private static double k2;
+		private static int n;
 		private double raioComunity;
 		private Location.Location2D bounds;
 
@@ -794,31 +802,34 @@ public interface Mobility
 		public NomadicRectgular(Location.Location2D bounds,String config, int n){
 			String ksConfigOptions [];
 			ksConfigOptions= config.split(":");
-			k1 = Double.parseDouble(ksConfigOptions[0]);
-			k2 =Double.parseDouble(ksConfigOptions[1]);
-			this.n = n;
+			Vmin = Double.parseDouble(ksConfigOptions[0]);
+			Vmax = Double.parseDouble(ksConfigOptions[1]);
+			k2 =Double.parseDouble(ksConfigOptions[2]);
+			NomadicRectgular.n = n;
 			this.bounds = bounds;
-			this.qtdpointReference = Integer.parseInt(ksConfigOptions[2]);
+			qtdpointReference = Integer.parseInt(ksConfigOptions[3]);
 			heads = new NomadicRectgularInfo[qtdpointReference];
-			this.raioComunity = Double.parseDouble(ksConfigOptions[3]);
-			this.pauseTime = Integer.parseInt(ksConfigOptions[4]);;  
+			this.raioComunity = Double.parseDouble(ksConfigOptions[4]);
+			this.pauseTime = Integer.parseInt(ksConfigOptions[5]);
+			this.steps = Integer.parseInt(ksConfigOptions[6]);;  
 		} 
 		public MobilityInfo init(FieldInterface f, Integer id, Location loc) {
 
 			NomadicRectgularInfo info;
 
-
+			
 
 			if(jaqtdpointReference<qtdpointReference){
+				
 
-				info = new NomadicRectgularInfo(k1,k2,n,true);
+				info = new NomadicRectgularInfo(Vmin,Vmax,k2,n,true,steps);
 				info.loc = loc;
 				info.tipo = 1;
 				heads[jaqtdpointReference] = info;
 				jaqtdpointReference++;
 			}
 			else{
-				info = new NomadicRectgularInfo(k1,k2,n,false);
+				info = new NomadicRectgularInfo(Vmin,Vmax,k2,n,false,steps);
 				for (NomadicRectgularInfo i : heads) {
 					if(loc.inside(i.loc, new Location.Location2D((float)(i.loc.getX()+raioComunity),(float)(i.loc.getY()+raioComunity))))
 					{
@@ -852,7 +863,6 @@ public interface Mobility
 
 				}
 			}else{
-				JistAPI.sleep(1*Constants.SECOND);
 				moveRadio(f, id, loc, noinfo);
 
 			}
@@ -896,9 +906,14 @@ public interface Mobility
 				X_mov_rel = headinfo.loc.getX();
 				Y_mov_rel = headinfo.loc.getY();
 			}
-
-			double newX = xnode + uinfo.velocity*Math.cos(uinfo.direction);
-			double newY = ynode + uinfo.velocity*Math.sin(uinfo.direction);
+/*
+			double stepDist = uinfo.velocity*uinfo.stepTime;
+			double newX = loc.getX()+ stepDist*Math.cos(uinfo.direction);
+			double newY = loc.getY()+ stepDist*Math.sin(uinfo.direction);
+*/		
+			double stepDist = uinfo.velocity*uinfo.stepTime;
+			double newX = xnode + stepDist*Math.cos(uinfo.direction);
+			double newY = ynode + stepDist*Math.sin(uinfo.direction);
 			while(newX<0 || newX>X || newY<0 || newY>Y){
 				double deltaXExt = newX-xnode;
 				double deltaYExt = newY-ynode;
@@ -988,7 +1003,8 @@ public interface Mobility
 
 
 			}
-			uinfo.distance -= uinfo.velocity;
+			uinfo.stepsCurr--;
+			//uinfo.distance -= uinfo.velocity;
 			Location2D newLoc = new Location2D((float)(newX+X_mov_rel),(float)(newY+Y_mov_rel));
 			/*if(id==1 )
   {
@@ -996,8 +1012,10 @@ public interface Mobility
 
   }*/
 
+			JistAPI.sleep((long)(uinfo.stepTime*Constants.SECOND));
+			
 			f.moveRadio(id,newLoc);
-			if(uinfo.distance<0){
+			if(uinfo.stepsCurr<=0){
 				uinfo.renew();
 			}
 

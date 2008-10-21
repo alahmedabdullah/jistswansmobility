@@ -51,10 +51,10 @@ public class RouteAodv implements RouteInterface.Aodv
   public static final int MAX_RREQ_BUFFER_SIZE = 10;
   
   /** Period of time after which the AODV timeout event gets called. */
-  public static final long AODV_TIMEOUT = 30 * Constants.SECOND;
+  public static final long AODV_TIMEOUT = 20 * Constants.SECOND;
   
   /** Duration of inactivity after which a HELLO message should be sent to a precursor. */
-  public static final long HELLO_INTERVAL = 30 * Constants.SECOND;
+  public static final long HELLO_INTERVAL = 20 * Constants.SECOND;
   
   /**
    * Number of timeout periods that must pass before this node can determine an outgoing

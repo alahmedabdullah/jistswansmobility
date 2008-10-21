@@ -140,6 +140,7 @@ public final class Constants
   
   public static final int MOBILITY_UNIFORM_RECT_NOMANDE = 9;
   public static final int MOBILITY_UNIFORM_CIRCLE_NOMANDE = 10;
+  public static final int MOBILITY_GAUSS_MARKOV = 11;
   /** node mobility choice constant. */
   public static final int MOBILITY_DEFAULT  = MOBILITY_STATIC;
 

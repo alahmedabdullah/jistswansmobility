@@ -66,6 +66,7 @@ public class BufferedWriter extends java.io.BufferedWriter
   /** @see java.io.BufferedWriter */
   void flushBuffer() throws IOException, JistAPI.Continuable 
   {
+	 
     synchronized (lock) 
     {
       ensureOpen();
