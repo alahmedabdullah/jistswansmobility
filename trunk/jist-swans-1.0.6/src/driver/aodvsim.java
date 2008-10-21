@@ -94,7 +94,7 @@ private static PrintStream statsfile;
     /** Packet loss options. */
     private String lossOpts = "0.2";
     /** Number of messages sent per minute per node. */
-    private double sendRate = 4*60.0;
+    private double sendRate =144;
     /** Start of sending (seconds). */
     private int startTime = 10;
     /** Number of seconds to send messages. */
@@ -629,13 +629,17 @@ private static PrintStream statsfile;
     for(int i=0; i<numTotalMessages; i++)
     {
       //pick random send node
-      int srcIdx = Constants.random.nextInt(routers.size());
+      int srcIdx = Constants.random.nextInt(routers.size()-20);
+      
+      
       int destIdx;
       do
       {
         //pick random dest node
         destIdx = Constants.random.nextInt(routers.size());
       } while (destIdx == srcIdx);
+     
+      
       RouteAodv srcAodv = (RouteAodv)routers.elementAt(srcIdx);
       RouteAodv destAodv = (RouteAodv)routers.elementAt(destIdx);
       
