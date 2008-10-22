@@ -1,6 +1,6 @@
 @set JAVA=java
 @set JAVA_OPT=-server
-@rem set JAVA="c:\program files\ibm\java13\bin\java"
+@rem set JAVA="C:\Program Files (x86)\Java\jre1.5.0_16\bin\java"
 @rem set JAVA_OPT=
 
 @set CP=..\libs\bcel.jar;..\libs\bsh.jar;..\libs\jargs.jar;..\libs\log4j.jar;..\libs\jython.jar;..\src;%CLASSPATH%
