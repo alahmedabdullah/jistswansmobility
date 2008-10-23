@@ -574,7 +574,8 @@ private static PrintStream statsfile;
     if(opts.guisupport)
     {
     	//JAVIS -GUI SUPPORT
-    	JavisTrace.createTraceSetTrace(field,"aodvsim_"+opts.nodes+"_"+mobilityString+"Snr_"+opts.limiteSNR+"_NodeSim");
+    	//JavisTrace.createTraceSetTrace(field,"aodvsim_"+opts.nodes+"_"+mobilityString+"Snr_"+opts.limiteSNR+"_NodeSim");
+    	JavisTrace.createTraceSetTrace(field,"aodvsim_output_jist_swans");
     	
     	
     	FileOutputStream out; // declare a file output object
