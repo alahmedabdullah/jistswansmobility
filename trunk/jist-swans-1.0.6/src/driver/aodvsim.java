@@ -585,7 +585,7 @@ private static PrintStream statsfile;
                 // Create a new file output stream
                 // connected to "myfile.txt"
                 try {
-					out = new FileOutputStream("aodvsim_"+opts.nodes+"_"+mobilityString+"Snr_"+opts.limiteSNR+"_NodeSim_stats_Aodv");
+					out = new FileOutputStream("aodvsim_output_jist_swans_stats_aodv");
 					statsfile = new PrintStream( out );
 
                 } catch (FileNotFoundException e) {
@@ -630,7 +630,7 @@ private static PrintStream statsfile;
     for(int i=0; i<numTotalMessages; i++)
     {
       //pick random send node
-      int srcIdx = Constants.random.nextInt(routers.size()-20);
+      int srcIdx = Constants.random.nextInt(routers.size());
       
       
       int destIdx;
