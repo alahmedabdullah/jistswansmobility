@@ -92,12 +92,13 @@ public interface Mobility
 	
 	public static class GaussMarkov implements Mobility{
 
-		public double direction_medio;
+		private double direction_medio;
 		private double speed_medio;
 		private double borda;
 		private double maxSpeed;
 		private double minSpeed;
 		private double alpha;
+		private double pauseTime = 1;
 		private Location field;
 		private double limiteXsup;
 		private double limiteYsup;
@@ -164,14 +165,12 @@ public interface Mobility
 	        double d_old = gminfo.direction;
 	        double x_new = x_old + s_old*Math.cos(d_old);
 	        double y_new = y_old + s_old*Math.sin(d_old);
-	        double dist = Math.sqrt(Math.pow(x_old-x_new, 2)+Math.pow(y_old-y_new, 2));
-	        double stepTime = dist/gminfo.speed;
 	        gminfo.direction = direction_new;
 	        gminfo.speed =speed_new;
-	        JistAPI.sleep((long)(stepTime*Constants.SECOND));	        
+	        JistAPI.sleep((long)(pauseTime*Constants.SECOND));	        
 	        Location newloc = new Location.Location2D((float)x_new,(float)y_new);
-	        //if(newloc.inside(new Location.Location2D(0,0) ,new Location.Location2D(field.getX(),field.getY())))
-	        f.moveRadio(id, newloc);
+	        if(newloc.inside(new Location.Location2D(0,0) ,new Location.Location2D(field.getX(),field.getY())))
+	        	f.moveRadio(id, newloc);
 		}
 
 	}
@@ -337,50 +336,26 @@ public interface Mobility
 	{
 		public double direction;
 		public double distance;
-		//public double distanceCurr;
 		public int steps;
-		public int stepsCurr;
 		public double stepTime;
 		public double velocity;
-		public double velocityMax;
-		public double velocityMin;
-		private double m1;
-		public UniformRectagularInfo(){
-
-		}
-		public UniformRectagularInfo(double Vmin,double Vmax,double k2,int steps,int n){
-			velocityMin =Vmin;
-			velocityMax = Vmax;
-			this.steps=steps;
+		
+		public UniformRectagularInfo(double velocityMin,double velocityMax,double mu,int steps){
 			direction = 2*Math.PI*Constants.random.nextDouble();
 			velocity =  velocityMin + (velocityMax -velocityMin)*Constants.random.nextDouble(); // speedmin+(speedmax - speedmin)*rand
-			
-			m1 = k2/n;
-			distance = Constants.exprnd(m1);
-		//	distanceCurr = distance;
-			
+			distance = Constants.exprnd(mu);
+			this.steps = steps;			
 			double timeTotal = distance/velocity;
-			this.stepTime =timeTotal/steps;
-			stepsCurr = steps;
-			
+			this.stepTime =timeTotal/steps;		
 			
 		}
-		public void renew(){
-			direction = 2*Math.PI*Constants.random.nextDouble();
-			distance = Constants.exprnd(m1);
-		//	distanceCurr = distance;
-			velocity =  velocityMin + (velocityMax -velocityMin)*Constants.random.nextDouble();
-			double timeTotal = distance/velocity;
-			this.stepTime = (timeTotal/steps);
-			stepsCurr = steps;
-		}
-
+		
 
 	}
 	public static class UniformRectagular implements Mobility
 	{
 
-		private double Vmax,Vmin,k2;
+		private double Vmax,Vmin,mu;
 		private int n,steps;
 		private Location.Location2D bounds;
 		public UniformRectagular(Location.Location2D bounds,String config, int n){
@@ -388,7 +363,8 @@ public interface Mobility
 			ksConfigOptions= config.split(":");
 			Vmin = Double.parseDouble(ksConfigOptions[0]);
 			Vmax = Double.parseDouble(ksConfigOptions[1]);
-			k2 =Double.parseDouble(ksConfigOptions[2]);
+			double k2 =Double.parseDouble(ksConfigOptions[2]);
+			mu = k2/n;
 			steps =Integer.parseInt(ksConfigOptions[3]);
 			this.n = n;
 			this.bounds = bounds;
@@ -396,12 +372,11 @@ public interface Mobility
 
 		public MobilityInfo init(FieldInterface f, Integer id, Location loc) {
 
-			return new UniformRectagularInfo(Vmin,Vmax,k2,steps,n);
+			return new UniformRectagularInfo(Vmin,Vmax,mu,steps);
 		}
 
 		public void next(FieldInterface f, Integer id, Location loc, MobilityInfo info) {
 			UniformRectagularInfo uinfo = (UniformRectagularInfo)info;
-			//Location locAnterior = loc;
 			double stepDist = uinfo.velocity*uinfo.stepTime;
 			double newX = loc.getX()+ stepDist*Math.cos(uinfo.direction);
 			double newY = loc.getY()+ stepDist*Math.sin(uinfo.direction);
@@ -494,23 +469,14 @@ public interface Mobility
 
 
 			}
-			uinfo.stepsCurr--;
+			uinfo.steps--;
 			Location2D newLoc = new Location2D((float)newX,(float)newY);
-//			if(id==1 )
-//		  {
-//				System.err.println((long)(uinfo.stepTime*Constants.SECOND));
-//		  }
-////			long t=(long)uinfo.stepTime*Constants.SECOND;
-////			if(t!=0)
-			JistAPI.sleep((long)(uinfo.stepTime*Constants.SECOND));
-			
+			JistAPI.sleep((long)(uinfo.stepTime*Constants.SECOND));		
 			f.moveRadio(id,newLoc);
-			if(uinfo.stepsCurr<=0){
-				uinfo.renew();
+			if(uinfo.steps<=0){
+				uinfo =  new UniformRectagularInfo(Vmin,Vmax,mu,steps);;
 			}
-
 		}
-
 	}
 
 	public static class NomadicCircularInfo implements MobilityInfo
