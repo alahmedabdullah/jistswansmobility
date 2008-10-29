@@ -363,8 +363,7 @@ public interface Mobility
 			ksConfigOptions= config.split(":");
 			Vmin = Double.parseDouble(ksConfigOptions[0]);
 			Vmax = Double.parseDouble(ksConfigOptions[1]);
-			double k2 =Double.parseDouble(ksConfigOptions[2]);
-			mu = k2/n;
+			mu = Double.parseDouble(ksConfigOptions[2]);
 			steps =Integer.parseInt(ksConfigOptions[3]);
 			this.n = n;
 			this.bounds = bounds;
@@ -712,22 +711,16 @@ public interface Mobility
 		public double direction;
 		public double distance;
 		public double velocity;
-		private double Vmin,Vmax;
-		private int steps;
 		public int stepsCurr;
 		public double stepTime;
 		public Location loc;
 		public boolean ishead=false;
 		public int tipo = 3;
 		public ArrayList<Integer> nodesInternos=new ArrayList<Integer>();;
-		private double mu;
 
-		public NomadicRectgularInfo(double Vmin, double Vmax,double k2,int n,boolean ishead,int steps){
+
+		public NomadicRectgularInfo(double Vmin, double Vmax,double mu,boolean ishead,int steps){
 			
-			this.Vmin = Vmin;
-			this.Vmax = Vmax;
-			mu = k2/n;
-			this.steps = steps;
 			stepsCurr = steps;
 			this.ishead = ishead;
 			direction = 2*Math.PI*Constants.random.nextDouble();
@@ -739,7 +732,7 @@ public interface Mobility
 		public NomadicRectgularInfo(){
 
 		}
-		public void renew(){
+		public void renew(double Vmin, double Vmax, double mu,int steps){
 			direction = 2*Math.PI*Constants.random.nextDouble();
 			distance = Constants.exprnd(mu);
 			velocity = Vmin + (Vmax - Vmin)*Constants.random.nextDouble(); // speedmin+(speedmax - speedmin)*rand
@@ -758,20 +751,18 @@ public interface Mobility
 		private static double Vmax,Vmin;
 		private int pauseTime;
 		private int steps;
-		private static double k2;
-		private static int n;
+		private static double mu;
 		private double raioComunity;
 		private Location.Location2D bounds;
 
 
 
-		public NomadicRectgular(Location.Location2D bounds,String config, int n){
+		public NomadicRectgular(Location.Location2D bounds,String config){
 			String ksConfigOptions [];
 			ksConfigOptions= config.split(":");
 			Vmin = Double.parseDouble(ksConfigOptions[0]);
 			Vmax = Double.parseDouble(ksConfigOptions[1]);
-			k2 =Double.parseDouble(ksConfigOptions[2]);
-			NomadicRectgular.n = n;
+			mu =Double.parseDouble(ksConfigOptions[2]);
 			this.bounds = bounds;
 			qtdpointReference = Integer.parseInt(ksConfigOptions[3]);
 			heads = new NomadicRectgularInfo[qtdpointReference];
@@ -782,20 +773,19 @@ public interface Mobility
 		public MobilityInfo init(FieldInterface f, Integer id, Location loc) {
 
 			NomadicRectgularInfo info;
-
-			
+	
 
 			if(jaqtdpointReference<qtdpointReference){
 				
 
-				info = new NomadicRectgularInfo(Vmin,Vmax,k2,n,true,steps);
+				info = new NomadicRectgularInfo(Vmin,Vmax,mu,true,steps);
 				info.loc = loc;
 				info.tipo = 1;
 				heads[jaqtdpointReference] = info;
 				jaqtdpointReference++;
 			}
 			else{
-				info = new NomadicRectgularInfo(Vmin,Vmax,k2,n,false,steps);
+				info = new NomadicRectgularInfo(Vmin,Vmax,mu,false,steps);
 				for (NomadicRectgularInfo i : heads) {
 					if(loc.inside(i.loc, new Location.Location2D((float)(i.loc.getX()+raioComunity),(float)(i.loc.getY()+raioComunity))))
 					{
@@ -982,7 +972,7 @@ public interface Mobility
 			
 			f.moveRadio(id,newLoc);
 			if(uinfo.stepsCurr<=0){
-				uinfo.renew();
+				uinfo.renew(Vmin,Vmax,mu,steps);
 			}
 
 			return newLoc;
