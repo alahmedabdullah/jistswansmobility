@@ -162,7 +162,7 @@ public class aodv
 			mobility = new Mobility.UniformRectagular(field, mobilityOpts,nodes);
 			break;
 		case Constants.MOBILITY_UNIFORM_RECT_NOMANDE:
-			mobility = new Mobility.NomadicRectgular(field, mobilityOpts,nodes);
+			mobility = new Mobility.NomadicRectgular(field, mobilityOpts);
 			break;
 		case Constants.MOBILITY_UNIFORM_CIRCLE_NOMANDE:
 			mobility = new Mobility.NomadicCircular(field, mobilityOpts,nodes);

@@ -489,7 +489,7 @@ private static PrintStream statsfile;
           mobility = new Mobility.UniformRectagular(opts.field, opts.mobilityOpts,opts.nodes);
           break;
       case Constants.MOBILITY_UNIFORM_RECT_NOMANDE:
-          mobility = new Mobility.NomadicRectgular(opts.field, opts.mobilityOpts,opts.nodes);
+          mobility = new Mobility.NomadicRectgular(opts.field, opts.mobilityOpts);
           break;
       case Constants.MOBILITY_UNIFORM_CIRCLE_NOMANDE:
           mobility = new Mobility.NomadicCircular(opts.field, opts.mobilityOpts,opts.nodes);
