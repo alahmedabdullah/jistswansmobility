@@ -13,7 +13,6 @@ package jist.swans.field;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import jist.swans.field.Field.RadioData;
 import jist.swans.misc.Location;
 import jist.swans.misc.Util;
 import jist.swans.misc.Location.Location2D;
@@ -77,62 +76,60 @@ public interface Mobility
 	// uniform mobility model
 	//
 	public static class GaussMarkovInfo implements MobilityInfo{
-		public double speed;
-		public double direction;
-		public double direction_medio;
+		public double velocidade;
+		public double velocidadeMedia;
+		public double direcao;
+		public double direcaoMedia;
 		
-		public GaussMarkovInfo(double speed,double direction,double d_){
-			this.speed = speed;
-			this.direction = direction;
-			direction_medio = d_;
-			
+		public GaussMarkovInfo(double speed,double speed_medio,double direction,double direction_medio){
+			this.velocidade = speed;
+			this.direcao = direction;
+			this.direcaoMedia = direction_medio;
+			this.velocidadeMedia = speed_medio;	
 		}
-		
 	}
 	
 	public static class GaussMarkov implements Mobility{
 
-		private double direction_medio;
-		private double speed_medio;
+		private double direcaoMediaInicial;
+		private double velocidadeMediaInicial;
 		private double borda;
-		private double maxSpeed;
-		private double minSpeed;
+		private double vMax;
+		private double vMin;
 		private double alpha;
-		private double pauseTime = 1;
-		private Location field;
-		private double limiteXsup;
-		private double limiteYsup;
-		private double limiteXinf;
-		private double limiteYinf;
+		private double tempoPausa = 1;
+		private Location limites;
+
 		
-		public GaussMarkov(Location field, String config){
-			this.field = field;
+		public GaussMarkov(Location bounds, String config){
+			this.limites = bounds;
 			String GaussMarkovConfigOptions [];
 			GaussMarkovConfigOptions= config.split(":");
-			minSpeed = Double.parseDouble(GaussMarkovConfigOptions[0]);
-			maxSpeed =Double.parseDouble(GaussMarkovConfigOptions[1]);
-			speed_medio = Double.parseDouble(GaussMarkovConfigOptions[2]);
-			direction_medio =Double.parseDouble(GaussMarkovConfigOptions[3]);
+			vMin = Double.parseDouble(GaussMarkovConfigOptions[0]);
+			vMax =Double.parseDouble(GaussMarkovConfigOptions[1]);
+			velocidadeMediaInicial = Double.parseDouble(GaussMarkovConfigOptions[2]);
+			direcaoMediaInicial =Double.parseDouble(GaussMarkovConfigOptions[3]);
 			alpha =Double.parseDouble(GaussMarkovConfigOptions[4]);
 			borda =Double.parseDouble(GaussMarkovConfigOptions[5]);
-			limiteXinf = borda*field.getX();
-			limiteYinf = borda*field.getY();
-			limiteXsup = field.getX() - borda*field.getX();
-			limiteYsup = field.getY() - borda*field.getY();
 			
 		}
 		public MobilityInfo init(FieldInterface f, Integer id, Location loc) {
-			double speed = minSpeed + (maxSpeed-minSpeed)*Constants.random.nextDouble();
-			double direction = 2*Math.PI*Constants.random.nextDouble();		
-			return new GaussMarkovInfo(speed,direction,direction_medio);
+			double speed_inicial = vMin + (vMax-vMin)*Constants.random.nextDouble();
+			double direction_inicial = 2*Math.PI*Constants.random.nextDouble();		
+			return new GaussMarkovInfo(speed_inicial,velocidadeMediaInicial,direction_inicial,direcaoMediaInicial);
 		}
 
 		public void next(FieldInterface f, Integer id, Location loc, MobilityInfo info) {
 			double x = loc.getX();
 			double y = loc.getY();
+			double limiteXinf = borda*limites.getX();
+			double limiteYinf = borda*limites.getY();
+			double limiteXsup = limites.getX() - borda*limites.getX();
+			double limiteYsup = limites.getY() - borda*limites.getY();
+			
 			GaussMarkovInfo gminfo = (GaussMarkovInfo)info;
-			double direction_medio = gminfo.direction_medio;
-			double X=field.getX(),Y=field.getY();
+			double direction_medio = gminfo.direcaoMedia;
+			double X=limites.getX(),Y=limites.getY();
 			if (x > 0 && x < limiteXinf && y > 0 && y < limiteYinf)
 				direction_medio = Math.PI/4;
 			else if (x > limiteXinf && x < limiteXsup && x > 0 && y < limiteYinf)
@@ -150,26 +147,26 @@ public interface Mobility
 			else if (x > 0 && x < limiteXinf && y > limiteYinf  && y< limiteYsup)
 				direction_medio = 0;
 			else
-				direction_medio = gminfo.direction_medio;
-			gminfo.direction_medio = direction_medio;
-			double speed_old = gminfo.speed;
-	        double direction_old = gminfo.direction;
-	        double s_ = speed_medio;
-	        double d_ = gminfo.direction_medio;
+				direction_medio = gminfo.direcaoMedia;
+			gminfo.direcaoMedia = direction_medio;
+			double speed_old = gminfo.velocidade;
+	        double direction_old = gminfo.direcao;
+	        double s_ = gminfo.velocidadeMedia;
+	        double d_ = gminfo.direcaoMedia;
 	        double speed_new = alpha*speed_old + (1-alpha)*s_ + Math.sqrt(Math.pow(1-alpha,2))*Constants.random.nextGaussian();
 	        double direction_new =alpha*direction_old + (1-alpha)*d_ + Math.sqrt(Math.pow(1-direction_old,2))*Constants.random.nextGaussian();
 	        
 	        double x_old = loc.getX();
 	        double y_old = loc.getY();
-	        double s_old = gminfo.speed;
-	        double d_old = gminfo.direction;
+	        double s_old = gminfo.velocidade;
+	        double d_old = gminfo.direcao;
 	        double x_new = x_old + s_old*Math.cos(d_old);
 	        double y_new = y_old + s_old*Math.sin(d_old);
-	        gminfo.direction = direction_new;
-	        gminfo.speed =speed_new;
-	        JistAPI.sleep((long)(pauseTime*Constants.SECOND));	        
+	        gminfo.direcao = direction_new;
+	        gminfo.velocidade =speed_new;
+	        JistAPI.sleep((long)(tempoPausa*Constants.SECOND));	        
 	        Location newloc = new Location.Location2D((float)x_new,(float)y_new);
-	        if(newloc.inside(new Location.Location2D(0,0) ,new Location.Location2D(field.getX(),field.getY())))
+	        if(newloc.inside(new Location.Location2D(0,0) ,new Location.Location2D(limites.getX(),limites.getY())))
 	        	f.moveRadio(id, newloc);
 		}
 
@@ -332,56 +329,54 @@ public interface Mobility
 		}
 	}
 
-	public static class UniformRectagularInfo implements MobilityInfo
+	public static class UniformeInfo implements MobilityInfo
 	{
-		public double direction;
-		public double distance;
-		public int steps;
-		public double stepTime;
-		public double velocity;
+		public double direcao;
+		public double distancia;
+		public int passos;
+		public double tempoPasso;
+		public double velocidade;
 		
-		public UniformRectagularInfo(double velocityMin,double velocityMax,double mu,int steps){
-			direction = 2*Math.PI*Constants.random.nextDouble();
-			velocity =  velocityMin + (velocityMax -velocityMin)*Constants.random.nextDouble(); // speedmin+(speedmax - speedmin)*rand
-			distance = Constants.exprnd(mu);
-			this.steps = steps;			
-			double timeTotal = distance/velocity;
-			this.stepTime =timeTotal/steps;		
-			
+		public UniformeInfo(double velocityMin,double velocityMax,double mu,int steps){
+			direcao = 2*Math.PI*Constants.random.nextDouble();
+			velocidade =  velocityMin + (velocityMax -velocityMin)*Constants.random.nextDouble(); // speedmin+(speedmax - speedmin)*rand
+			distancia = Constants.exprnd(mu);
+			this.passos = steps;			
+			double timeTotal = distancia/velocidade;
+			this.tempoPasso =timeTotal/steps;				
 		}
-		
-
 	}
-	public static class UniformRectagular implements Mobility
+	public static class Uniforme implements Mobility
 	{
 
-		private double Vmax,Vmin,mu;
-		private int n,steps;
-		private Location.Location2D bounds;
-		public UniformRectagular(Location.Location2D bounds,String config, int n){
+		private double vMax,vMin,mu;
+		private int passos;
+		private Location.Location2D limites;
+		
+		public Uniforme(Location.Location2D bounds,String config, int n){
+			this.limites = bounds;
 			String ksConfigOptions [];
 			ksConfigOptions= config.split(":");
-			Vmin = Double.parseDouble(ksConfigOptions[0]);
-			Vmax = Double.parseDouble(ksConfigOptions[1]);
+			vMin = Double.parseDouble(ksConfigOptions[0]);
+			vMax = Double.parseDouble(ksConfigOptions[1]);
 			mu = Double.parseDouble(ksConfigOptions[2]);
-			steps =Integer.parseInt(ksConfigOptions[3]);
-			this.n = n;
-			this.bounds = bounds;
+			passos =Integer.parseInt(ksConfigOptions[3]);
+			
 		}
 
 		public MobilityInfo init(FieldInterface f, Integer id, Location loc) {
 
-			return new UniformRectagularInfo(Vmin,Vmax,mu,steps);
+			return new UniformeInfo(vMin,vMax,mu,passos);
 		}
 
 		public void next(FieldInterface f, Integer id, Location loc, MobilityInfo info) {
-			UniformRectagularInfo uinfo = (UniformRectagularInfo)info;
-			double stepDist = uinfo.velocity*uinfo.stepTime;
-			double newX = loc.getX()+ stepDist*Math.cos(uinfo.direction);
-			double newY = loc.getY()+ stepDist*Math.sin(uinfo.direction);
-			while(newX<0 || newX>bounds.getX() || newY<0 || newY>bounds.getY()){
-				double deltaXExt = newX-loc.getX();
-				double deltaYExt = newY-loc.getY();
+			UniformeInfo uinfo = (UniformeInfo)info;
+			double stepDist = uinfo.velocidade*uinfo.tempoPasso;
+			double novoX = loc.getX()+ stepDist*Math.cos(uinfo.direcao);
+			double novoY = loc.getY()+ stepDist*Math.sin(uinfo.direcao);
+			while(novoX<0 || novoX>limites.getX() || novoY<0 || novoY>limites.getY()){
+				double deltaXExt = novoX-loc.getX();
+				double deltaYExt = novoY-loc.getY();
 				double a = deltaYExt/deltaXExt;
 				double b =  deltaYExt - (a*deltaXExt);
 				/* equaçao da reta;
@@ -391,89 +386,61 @@ public interface Mobility
 				Location2D lastPoint = null,reflexPoint=null;
 				double deltaXInt, deltaYInt; 
 
-				if(newY<0){
+				if(novoY<0){
 					lastPoint = new Location2D((float)((0 - b)/a),0); 
-					reflexPoint = new Location2D((float)newX,(float)(-1*newY)); 
-					newY = -1*newY;
-					//////new direction after reflection
-					if(uinfo.direction>3*Math.PI/2 && uinfo.direction<2*Math.PI){
+					reflexPoint = new Location2D((float)novoX,(float)(-1*novoY)); 
+					novoY = -1*novoY;
+					deltaXInt = reflexPoint.getX() - lastPoint.getX();
+					deltaYInt = reflexPoint.getY() - lastPoint.getY(); 
+					
+					if(uinfo.direcao>3*Math.PI/2 && uinfo.direcao<2*Math.PI)					
+						uinfo.direcao =  Math.atan(deltaYInt/deltaXInt);
+					if(uinfo.direcao>Math.PI && uinfo.direcao<3*Math.PI/2)
+						uinfo.direcao = Math.PI + Math.atan(deltaYInt/deltaXInt);
 
-						deltaXInt = reflexPoint.getX() - lastPoint.getX();
-						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction =  Math.atan(deltaYInt/deltaXInt);
-					}
-					if(uinfo.direction>Math.PI && uinfo.direction<3*Math.PI/2){
-
-						deltaXInt = reflexPoint.getX() - lastPoint.getX();
-						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction = Math.PI + Math.atan(deltaYInt/deltaXInt);
-					}
-
-
-				}else if(newY>bounds.getY()){
-					lastPoint = new Location2D((float)((bounds.getY() - b)/a),bounds.getY()); 
-					reflexPoint = new Location2D((float)newX,(float)(2*bounds.getY() - newY)); 
-					newY = 2*bounds.getY() - newY;
-					//////new direction after reflection
-					if(uinfo.direction>0 && uinfo.direction<Math.PI/2){
-
-						deltaXInt = reflexPoint.getX() - lastPoint.getX();
-						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction =  2*Math.PI + Math.atan(deltaYInt/deltaXInt);
-					}
-					if(uinfo.direction>Math.PI/2 && uinfo.direction<3*Math.PI){
-						deltaXInt = reflexPoint.getX() - lastPoint.getX();
-						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction = Math.PI + Math.atan(deltaYInt/deltaXInt);
-					}
+				}else if(novoY>limites.getY()){
+					lastPoint = new Location2D((float)((limites.getY() - b)/a),limites.getY()); 
+					reflexPoint = new Location2D((float)novoX,(float)(2*limites.getY() - novoY)); 
+					novoY = 2*limites.getY() - novoY;
+					deltaXInt = reflexPoint.getX() - lastPoint.getX();
+					deltaYInt = reflexPoint.getY() - lastPoint.getY();
+					
+					if(uinfo.direcao>0 && uinfo.direcao<Math.PI/2)
+						uinfo.direcao =  2*Math.PI + Math.atan(deltaYInt/deltaXInt);
+					if(uinfo.direcao>Math.PI/2 && uinfo.direcao<3*Math.PI)
+						uinfo.direcao = Math.PI + Math.atan(deltaYInt/deltaXInt);
+					
 				}
-				else if(newX<0){
+				else if(novoX<0){
 					lastPoint = new Location2D(0,(float)(a*0 + b)); 
-					reflexPoint = new Location2D((float)(-1*newX),(float)newY); 
-					newX = -1*newX;
-					//////new direction after reflection
-					if(uinfo.direction>Math.PI && uinfo.direction<3*Math.PI/2){
-
-						deltaXInt = reflexPoint.getX() - lastPoint.getX();
-						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction = 2*Math.PI + Math.atan(deltaYInt/deltaXInt);
-					}
-					if(uinfo.direction>Math.PI/2 && uinfo.direction<Math.PI){
-
-						deltaXInt = reflexPoint.getX() - lastPoint.getX();
-						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction = Math.atan(deltaYInt/deltaXInt);
-					}
-
+					reflexPoint = new Location2D((float)(-1*novoX),(float)novoY); 
+					novoX = -1*novoX;
+					deltaXInt = reflexPoint.getX() - lastPoint.getX();
+					deltaYInt = reflexPoint.getY() - lastPoint.getY(); 
+					
+					if(uinfo.direcao>Math.PI && uinfo.direcao<3*Math.PI/2)
+						uinfo.direcao = 2*Math.PI + Math.atan(deltaYInt/deltaXInt);
+					if(uinfo.direcao>Math.PI/2 && uinfo.direcao<Math.PI)
+						uinfo.direcao = Math.atan(deltaYInt/deltaXInt);
 				}else{
-					lastPoint = new Location2D(bounds.getX(),(float)(a*bounds.getX() + b)); 
-					reflexPoint = new Location2D((float)(2*bounds.getX() - newX),(float)newY); 
-					newX = 2*bounds.getX() - newX;
-					//////new direction after reflection
-					if(uinfo.direction>0 && uinfo.direction<Math.PI/2){
-
-						deltaXInt = reflexPoint.getX() - lastPoint.getX();
-						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction = Math.PI + Math.atan(deltaYInt/deltaXInt);
-					}
-					if(uinfo.direction>3*Math.PI/2 && uinfo.direction<2*Math.PI){
-
-						deltaXInt = reflexPoint.getX() - lastPoint.getX();
-						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction = Math.PI  + Math.atan(deltaYInt/deltaXInt);
-					}
-
-
+					lastPoint = new Location2D(limites.getX(),(float)(a*limites.getX() + b)); 
+					reflexPoint = new Location2D((float)(2*limites.getX() - novoX),(float)novoY); 
+					novoX = 2*limites.getX() - novoX;
+					deltaXInt = reflexPoint.getX() - lastPoint.getX();
+					deltaYInt = reflexPoint.getY() - lastPoint.getY();
+				
+					if(uinfo.direcao>0 && uinfo.direcao<Math.PI/2)
+						uinfo.direcao = Math.PI + Math.atan(deltaYInt/deltaXInt);
+					if(uinfo.direcao>3*Math.PI/2 && uinfo.direcao<2*Math.PI)
+						uinfo.direcao = Math.PI  + Math.atan(deltaYInt/deltaXInt);
 				}
-
-
 			}
-			uinfo.steps--;
-			Location2D newLoc = new Location2D((float)newX,(float)newY);
-			JistAPI.sleep((long)(uinfo.stepTime*Constants.SECOND));		
+			uinfo.passos--;
+			Location2D newLoc = new Location2D((float)novoX,(float)novoY);
+			JistAPI.sleep((long)(uinfo.tempoPasso*Constants.SECOND));		
 			f.moveRadio(id,newLoc);
-			if(uinfo.steps<=0){
-				uinfo =  new UniformRectagularInfo(Vmin,Vmax,mu,steps);;
+			if(uinfo.passos<=0){
+				uinfo =  new UniformeInfo(vMin,vMax,mu,passos);
 			}
 		}
 	}
@@ -706,170 +673,133 @@ public interface Mobility
 
 		}
 	}
-	public static class NomadicRectgularInfo implements MobilityInfo
+	public static class GrupoUniformeInfo implements MobilityInfo
 	{
-		public double direction;
-		public double distance;
-		public double velocity;
-		public int stepsCurr;
-		public double stepTime;
-		public Location loc;
-		public boolean ishead=false;
+		public double direcao;
+		public double distancia;
+		public double velocidade;
+		public int passosExec;
+		public double tempoPasso;
+		public Location locReferencia;
 		public int tipo = 3;
-		public ArrayList<Integer> nodesInternos=new ArrayList<Integer>();;
+		public ArrayList<Integer> nosInternos=new ArrayList<Integer>();;
 
-
-		public NomadicRectgularInfo(double Vmin, double Vmax,double mu,boolean ishead,int steps){
-			
-			stepsCurr = steps;
-			this.ishead = ishead;
-			direction = 2*Math.PI*Constants.random.nextDouble();
-			distance = Constants.exprnd(mu);
-			velocity = Vmin + (Vmax - Vmin)*Constants.random.nextDouble(); // speedmin+(speedmax - speedmin)*rand
-			double timeTotal = distance/velocity;
-			this.stepTime =timeTotal/steps;	
-		}
-		public NomadicRectgularInfo(){
-
+		public GrupoUniformeInfo(double Vmin, double Vmax,double mu,int steps){	
+			this.passosExec = steps;
+			direcao = 2*Math.PI*Constants.random.nextDouble();
+			distancia = Constants.exprnd(mu);
+			velocidade = Vmin + (Vmax - Vmin)*Constants.random.nextDouble(); // speedmin+(speedmax - speedmin)*rand
+			double timeTotal = distancia/velocidade;
+			this.tempoPasso =timeTotal/steps;	
 		}
 		public void renew(double Vmin, double Vmax, double mu,int steps){
-			direction = 2*Math.PI*Constants.random.nextDouble();
-			distance = Constants.exprnd(mu);
-			velocity = Vmin + (Vmax - Vmin)*Constants.random.nextDouble(); // speedmin+(speedmax - speedmin)*rand
-			double timeTotal = distance/velocity;
-			this.stepTime =timeTotal/steps;	
-			stepsCurr=steps;
+			direcao = 2*Math.PI*Constants.random.nextDouble();
+			distancia = Constants.exprnd(mu);
+			velocidade = Vmin + (Vmax - Vmin)*Constants.random.nextDouble(); // speedmin+(speedmax - speedmin)*rand
+			double timeTotal = distancia/velocidade;
+			this.tempoPasso =timeTotal/steps;	
+			this.passosExec=steps;
 		}
 	}
 
 
-	public static class NomadicRectgular implements Mobility{
+	public static class GrupoUniforme implements Mobility{
 
 		private static int qtdpointReference;
 		private static int jaqtdpointReference=0;
-		private NomadicRectgularInfo []heads ;
-		private static double Vmax,Vmin;
-		private int pauseTime;
-		private int steps;
+		private GrupoUniformeInfo []nosReferencias ;
+		private static double vMax,vMin;
+		private int tempoPausa;
+		private int passos;
 		private static double mu;
-		private double raioComunity;
-		private Location.Location2D bounds;
+		private double diagonalGrupo;
+		private Location.Location2D limites;
 
-
-
-		public NomadicRectgular(Location.Location2D bounds,String config){
+		public GrupoUniforme(Location.Location2D bounds,String config){
 			String ksConfigOptions [];
 			ksConfigOptions= config.split(":");
-			Vmin = Double.parseDouble(ksConfigOptions[0]);
-			Vmax = Double.parseDouble(ksConfigOptions[1]);
+			vMin = Double.parseDouble(ksConfigOptions[0]);
+			vMax = Double.parseDouble(ksConfigOptions[1]);
 			mu =Double.parseDouble(ksConfigOptions[2]);
-			this.bounds = bounds;
+			this.limites = bounds;
 			qtdpointReference = Integer.parseInt(ksConfigOptions[3]);
-			heads = new NomadicRectgularInfo[qtdpointReference];
-			this.raioComunity = Double.parseDouble(ksConfigOptions[4]);
-			this.pauseTime = Integer.parseInt(ksConfigOptions[5]);
-			this.steps = Integer.parseInt(ksConfigOptions[6]);;  
+			nosReferencias = new GrupoUniformeInfo[qtdpointReference];
+			this.diagonalGrupo = Double.parseDouble(ksConfigOptions[4]);
+			this.tempoPausa = Integer.parseInt(ksConfigOptions[5]);
+			this.passos = Integer.parseInt(ksConfigOptions[6]);;  
 		} 
 		public MobilityInfo init(FieldInterface f, Integer id, Location loc) {
 
-			NomadicRectgularInfo info;
-	
-
+			GrupoUniformeInfo info;
 			if(jaqtdpointReference<qtdpointReference){
-				
-
-				info = new NomadicRectgularInfo(Vmin,Vmax,mu,true,steps);
-				info.loc = loc;
+				info = new GrupoUniformeInfo(vMin,vMax,mu,passos);
+				info.locReferencia = loc;
 				info.tipo = 1;
-				heads[jaqtdpointReference] = info;
-				jaqtdpointReference++;
+				nosReferencias[jaqtdpointReference++] = info;
 			}
 			else{
-				info = new NomadicRectgularInfo(Vmin,Vmax,mu,false,steps);
-				for (NomadicRectgularInfo i : heads) {
-					if(loc.inside(i.loc, new Location.Location2D((float)(i.loc.getX()+raioComunity),(float)(i.loc.getY()+raioComunity))))
+				info = new GrupoUniformeInfo(vMin,vMax,mu,passos);
+				for (GrupoUniformeInfo i : nosReferencias) {
+					if(loc.inside(i.locReferencia, new Location.Location2D((float)(i.locReferencia.getX()+diagonalGrupo),(float)(i.locReferencia.getY()+diagonalGrupo))))
 					{
-						i.nodesInternos.add(id);
+						i.nosInternos.add(id);
 						info.tipo = 2;
 					}
-
 				}
 			}
-
-
 			return info;
 		}
 
 		public void next(FieldInterface f, Integer id, Location loc, MobilityInfo info) {
-
-
-			NomadicRectgularInfo noinfo = (NomadicRectgularInfo) info;
-
+			GrupoUniformeInfo noinfo = (GrupoUniformeInfo) info;
 			if(id>=1 && id<=qtdpointReference){
-				// movimente o grupo correspondente;
-				JistAPI.sleep(pauseTime*Constants.SECOND);
+				JistAPI.sleep(tempoPausa*Constants.SECOND);
 				Location oldLoc = loc;
-				Location newLoc = moveRadio(f, id, loc, noinfo);
+				Location newLoc = moveNo(f, id, loc, noinfo);
 				double deltax =  newLoc.getX() - oldLoc.getX();
 				double deltay = newLoc.getY() -  oldLoc.getY(); 
-				noinfo.loc = newLoc;
-				for (Iterator iter = noinfo.nodesInternos.iterator(); iter.hasNext();) {
+				noinfo.locReferencia = newLoc;
+				for (Iterator iter = noinfo.nosInternos.iterator(); iter.hasNext();) {
 					Integer nointerno = (Integer) iter.next();
 					f.moveRadioOff(nointerno, new Location.Location2D((float)deltax,(float)deltay));
-
 				}
-			}else{
-				moveRadio(f, id, loc, noinfo);
-
-			}
-
-
-			//moveRadio(f, id, loc, noinfo);
-
-
-
-
-
-
+			}else
+				moveNo(f, id, loc, noinfo);
 		}
-		private NomadicRectgularInfo getHeadReference(Integer id){
-			for (int i = 0; i < heads.length; i++) {
-				NomadicRectgularInfo element = heads[i];
-				if (element.nodesInternos.contains(id))
+		private GrupoUniformeInfo getHeadReference(Integer id){
+			for (int i = 0; i < nosReferencias.length; i++) {
+				GrupoUniformeInfo element = nosReferencias[i];
+				if (element.nosInternos.contains(id))
 					return element;
 			}
 			return null;
 		}
-		private Location2D moveRadio(FieldInterface f, Integer id, Location loc, NomadicRectgularInfo uinfo) {
-			NomadicRectgularInfo headinfo = getHeadReference(id);
+		private Location2D moveNo(FieldInterface f, Integer id, Location loc, GrupoUniformeInfo uinfo) {
+			GrupoUniformeInfo headinfo = getHeadReference(id);
 			double xnode = loc.getX();
 			double ynode = loc.getY();
-			double X = bounds.getX();
-			double Y = bounds.getY();
+			double X = limites.getX();
+			double Y = limites.getY();
 			if (uinfo.tipo == 1){
-				X = bounds.getX()-raioComunity;
-				Y = bounds.getY()-raioComunity;
+				X = limites.getX()-diagonalGrupo;
+				Y = limites.getY()-diagonalGrupo;
 			}
 			if(X<0 || Y<0)
 				throw new Error("Largura do raio do grupo deve ser menor!");
 			double X_mov_rel = 0;
 			double Y_mov_rel = 0;
 			if(headinfo!=null){
-				xnode = loc.getX()-headinfo.loc.getX();
-				ynode = loc.getY()-headinfo.loc.getY();
-				X = raioComunity;
-				Y = raioComunity;
-				X_mov_rel = headinfo.loc.getX();
-				Y_mov_rel = headinfo.loc.getY();
+				xnode = loc.getX()-headinfo.locReferencia.getX();
+				ynode = loc.getY()-headinfo.locReferencia.getY();
+				X = diagonalGrupo;
+				Y = diagonalGrupo;
+				X_mov_rel = headinfo.locReferencia.getX();
+				Y_mov_rel = headinfo.locReferencia.getY();
 			}
-/*
-			double stepDist = uinfo.velocity*uinfo.stepTime;
-			double newX = loc.getX()+ stepDist*Math.cos(uinfo.direction);
-			double newY = loc.getY()+ stepDist*Math.sin(uinfo.direction);
-*/		
-			double stepDist = uinfo.velocity*uinfo.stepTime;
-			double newX = xnode + stepDist*Math.cos(uinfo.direction);
-			double newY = ynode + stepDist*Math.sin(uinfo.direction);
+	
+			double stepDist = uinfo.velocidade*uinfo.tempoPasso;
+			double newX = xnode + stepDist*Math.cos(uinfo.direcao);
+			double newY = ynode + stepDist*Math.sin(uinfo.direcao);
 			while(newX<0 || newX>X || newY<0 || newY>Y){
 				double deltaXExt = newX-xnode;
 				double deltaYExt = newY-ynode;
@@ -887,17 +817,17 @@ public interface Mobility
 					reflexPoint = new Location2D((float)newX,(float)(-1*newY)); 
 					newY = -1*newY;
 					//////new direction after reflection
-					if(uinfo.direction>3*Math.PI/2 && uinfo.direction<2*Math.PI){
+					if(uinfo.direcao>3*Math.PI/2 && uinfo.direcao<2*Math.PI){
 
 						deltaXInt = reflexPoint.getX() - lastPoint.getX();
 						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction =  Math.atan(deltaYInt/deltaXInt);
+						uinfo.direcao =  Math.atan(deltaYInt/deltaXInt);
 					}
-					if(uinfo.direction>Math.PI && uinfo.direction<3*Math.PI/2){
+					if(uinfo.direcao>Math.PI && uinfo.direcao<3*Math.PI/2){
 
 						deltaXInt = reflexPoint.getX() - lastPoint.getX();
 						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction = Math.PI + Math.atan(deltaYInt/deltaXInt);
+						uinfo.direcao = Math.PI + Math.atan(deltaYInt/deltaXInt);
 					}
 
 
@@ -906,16 +836,16 @@ public interface Mobility
 					reflexPoint = new Location2D((float)newX,(float)(2*Y - newY)); 
 					newY = 2*Y - newY;
 					//////new direction after reflection
-					if(uinfo.direction>0 && uinfo.direction<Math.PI/2){
+					if(uinfo.direcao>0 && uinfo.direcao<Math.PI/2){
 
 						deltaXInt = reflexPoint.getX() - lastPoint.getX();
 						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction =  2*Math.PI + Math.atan(deltaYInt/deltaXInt);
+						uinfo.direcao =  2*Math.PI + Math.atan(deltaYInt/deltaXInt);
 					}
-					if(uinfo.direction>Math.PI/2 && uinfo.direction<3*Math.PI){
+					if(uinfo.direcao>Math.PI/2 && uinfo.direcao<3*Math.PI){
 						deltaXInt = reflexPoint.getX() - lastPoint.getX();
 						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction = Math.PI + Math.atan(deltaYInt/deltaXInt);
+						uinfo.direcao = Math.PI + Math.atan(deltaYInt/deltaXInt);
 					}
 				}
 				else if(newX<0){
@@ -923,17 +853,17 @@ public interface Mobility
 					reflexPoint = new Location2D((float)(-1*newX),(float)newY); 
 					newX = -1*newX;
 					//////new direction after reflection
-					if(uinfo.direction>Math.PI && uinfo.direction<3*Math.PI/2){
+					if(uinfo.direcao>Math.PI && uinfo.direcao<3*Math.PI/2){
 
 						deltaXInt = reflexPoint.getX() - lastPoint.getX();
 						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction = 2*Math.PI + Math.atan(deltaYInt/deltaXInt);
+						uinfo.direcao = 2*Math.PI + Math.atan(deltaYInt/deltaXInt);
 					}
-					if(uinfo.direction>Math.PI/2 && uinfo.direction<Math.PI){
+					if(uinfo.direcao>Math.PI/2 && uinfo.direcao<Math.PI){
 
 						deltaXInt = reflexPoint.getX() - lastPoint.getX();
 						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction = Math.atan(deltaYInt/deltaXInt);
+						uinfo.direcao = Math.atan(deltaYInt/deltaXInt);
 					}
 
 				}else{
@@ -941,17 +871,17 @@ public interface Mobility
 					reflexPoint = new Location2D((float)(2*X - newX),(float)newY); 
 					newX = 2*X - newX;
 					//////new direction after reflection
-					if(uinfo.direction>0 && uinfo.direction<Math.PI/2){
+					if(uinfo.direcao>0 && uinfo.direcao<Math.PI/2){
 
 						deltaXInt = reflexPoint.getX() - lastPoint.getX();
 						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction = Math.PI + Math.atan(deltaYInt/deltaXInt);
+						uinfo.direcao = Math.PI + Math.atan(deltaYInt/deltaXInt);
 					}
-					if(uinfo.direction>3*Math.PI/2 && uinfo.direction<2*Math.PI){
+					if(uinfo.direcao>3*Math.PI/2 && uinfo.direcao<2*Math.PI){
 
 						deltaXInt = reflexPoint.getX() - lastPoint.getX();
 						deltaYInt = reflexPoint.getY() - lastPoint.getY();; 
-						uinfo.direction = Math.PI  + Math.atan(deltaYInt/deltaXInt);
+						uinfo.direcao = Math.PI  + Math.atan(deltaYInt/deltaXInt);
 					}
 
 
@@ -959,7 +889,7 @@ public interface Mobility
 
 
 			}
-			uinfo.stepsCurr--;
+			uinfo.passosExec--;
 			//uinfo.distance -= uinfo.velocity;
 			Location2D newLoc = new Location2D((float)(newX+X_mov_rel),(float)(newY+Y_mov_rel));
 			/*if(id==1 )
@@ -968,11 +898,11 @@ public interface Mobility
 
   }*/
 
-			JistAPI.sleep((long)(uinfo.stepTime*Constants.SECOND));
+			JistAPI.sleep((long)(uinfo.tempoPasso*Constants.SECOND));
 			
 			f.moveRadio(id,newLoc);
-			if(uinfo.stepsCurr<=0){
-				uinfo.renew(Vmin,Vmax,mu,steps);
+			if(uinfo.passosExec<=0){
+				uinfo.renew(vMin,vMax,mu,passos);
 			}
 
 			return newLoc;

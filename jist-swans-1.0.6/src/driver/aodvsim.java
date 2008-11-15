@@ -20,6 +20,7 @@ import jist.swans.radio.RadioNoise;
 import jist.swans.radio.RadioNoiseImprovedIndep;
 import jist.swans.radio.RadioNoiseIndep;
 import jist.swans.radio.RadioInfo;
+import jist.swans.mac.Mac802_11;
 import jist.swans.mac.MacAddress;
 import jist.swans.mac.MacDumb;
 import jist.swans.net.NetAddress;
@@ -94,7 +95,7 @@ private static PrintStream statsfile;
     /** Packet loss options. */
     private String lossOpts = "0.2";
     /** Number of messages sent per minute per node. */
-    private double sendRate =144;
+    private double sendRate =30;
     /** Start of sending (seconds). */
     private int startTime = 10;
     /** Number of seconds to send messages. */
@@ -486,10 +487,10 @@ private static PrintStream statsfile;
           mobility = new Mobility.UniformCircular(opts.field, opts.mobilityOpts,opts.nodes);
           break;
       case Constants.MOBILITY_UNIFORM_RECT:
-          mobility = new Mobility.UniformRectagular(opts.field, opts.mobilityOpts,opts.nodes);
+          mobility = new Mobility.Uniforme(opts.field, opts.mobilityOpts,opts.nodes);
           break;
       case Constants.MOBILITY_UNIFORM_RECT_NOMANDE:
-          mobility = new Mobility.NomadicRectgular(opts.field, opts.mobilityOpts);
+          mobility = new Mobility.GrupoUniforme(opts.field, opts.mobilityOpts);
           break;
       case Constants.MOBILITY_UNIFORM_CIRCLE_NOMANDE:
           mobility = new Mobility.NomadicCircular(opts.field, opts.mobilityOpts,opts.nodes);
@@ -650,12 +651,15 @@ private static PrintStream statsfile;
       
       NetMessage msg = new NetMessage.Ip(udpMsg, srcAodv.getLocalAddr(), destAodv.getLocalAddr(), 
           Constants.NET_PROTOCOL_UDP, Constants.NET_PRIORITY_NORMAL, Constants.TTL_DEFAULT);
+     // double end=JistAPI.getTime(),begin = JistAPI.getTime();
       srcAodv.getProxy().send(msg);
       //stats
       if (stats != null)
       {
         stats.netMsgs++;
+       // end = JistAPI.getTime();
       }
+     // System.err.println(end-begin);
       JistAPI.sleep(delayInterval);
     }
 
