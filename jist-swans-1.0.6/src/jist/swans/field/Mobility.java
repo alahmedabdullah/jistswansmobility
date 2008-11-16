@@ -343,7 +343,7 @@ public static class UniformeInfo implements MobilityInfo
 		distancia = Constants.exprnd(mu);
 		passos = (int)Math.max(Math.floor(distancia / 500/*precision*/),1);
 		float time = (float)(distancia/velocidade);
-		tempoPasso = (long)(time/passos);
+		tempoPasso = (time/passos);
 	}
 }
 public static class Uniforme implements Mobility
@@ -353,7 +353,7 @@ public static class Uniforme implements Mobility
 	private int passos;
 	private Location.Location2D limites;
 	
-	public Uniforme(Location.Location2D bounds,String config, int n){
+	public Uniforme(Location.Location2D bounds,String config){
 		this.limites = bounds;
 		String ksConfigOptions [];
 		ksConfigOptions= config.split(":");
@@ -452,8 +452,8 @@ public static class Uniforme implements Mobility
 		
 		Location2D newLoc = new Location2D((float)novoX,(float)novoY);
 		
-		
-		
+		System.out.println(uinfo.tempoPasso);
+		if(uinfo.tempoPasso!=0)
 		JistAPI.sleep((long)(uinfo.tempoPasso*Constants.SECOND));		
 		f.moveRadio(id,newLoc);
 		if(uinfo.passos<=0){
