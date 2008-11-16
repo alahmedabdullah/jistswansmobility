@@ -712,7 +712,7 @@ public static class GrupoUniformeInfo implements MobilityInfo
 		
 		passos = (int)Math.max(Math.floor(distancia / 500/*precision*/),1);
 		float time = (float)(distancia/velocidade);
-		tempoPasso = (long)(time/passos);
+		tempoPasso = (time/passos);
 		
 		
 	}
@@ -722,7 +722,7 @@ public static class GrupoUniformeInfo implements MobilityInfo
 		velocidade = Vmin + (Vmax - Vmin)*Constants.random.nextDouble(); // speedmin+(speedmax - speedmin)*rand
 		passos = (int)Math.max(Math.floor(distancia / 500/*precision*/),1);
 		float time = (float)(distancia/velocidade);
-		tempoPasso = (long)(time/passos);
+		tempoPasso = (time/passos);
 		
 	}
 }
