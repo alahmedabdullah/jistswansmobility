@@ -779,17 +779,21 @@ public static class GrupoUniforme implements Mobility{
 		GrupoUniformeInfo noinfo = (GrupoUniformeInfo) info;
 		if(id>=1 && id<=qtdpointReference){
 		//	JistAPI.sleep((long)(tempoPausa*Constants.SECOND));
-			Location oldLoc = loc;
+		/*	Location oldLoc = loc;
 			Location newLoc = moveNo(f, id, loc, noinfo);
 			double deltax =  newLoc.getX() - oldLoc.getX();
 			double deltay = newLoc.getY() -  oldLoc.getY(); 
 			noinfo.locReferencia = newLoc;
 			for (Iterator iter = noinfo.nosInternos.iterator(); iter.hasNext();) {
 				Integer nointerno = (Integer) iter.next();
-				f.moveRadioOff(nointerno, new Location.Location2D((float)deltax,(float)deltay));
-			}
-		}else
-			moveNo(f, id, loc, noinfo);
+				f.moveRadio(nointerno, newLoc);
+				
+			}*/
+		}else{
+			Location l = moveNo(f, id, loc, noinfo);
+			//noinfo.locReferencia=l;
+			
+		}
 	}
 	private GrupoUniformeInfo getHeadReference(Integer id){
 		for (int i = 0; i < nosReferencias.length; i++) {
@@ -809,8 +813,6 @@ public static class GrupoUniforme implements Mobility{
 			X = limites.getX()-diagonalGrupo;
 			Y = limites.getY()-diagonalGrupo;
 		}
-		if(X<0 || Y<0)
-			throw new Error("Largura do raio do grupo deve ser menor!");
 		double X_mov_rel = 0;
 		double Y_mov_rel = 0;
 		if(headinfo!=null){
