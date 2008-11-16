@@ -452,9 +452,9 @@ public static class Uniforme implements Mobility
 		
 		Location2D newLoc = new Location2D((float)novoX,(float)novoY);
 		
-		System.out.println(uinfo.tempoPasso);
+
 		if(uinfo.tempoPasso!=0)
-		JistAPI.sleep((long)(uinfo.tempoPasso*Constants.SECOND));		
+			JistAPI.sleep((long)(uinfo.tempoPasso*Constants.SECOND));		
 		f.moveRadio(id,newLoc);
 		if(uinfo.passos<=0){
 			uinfo =  new UniformeInfo(vMin,vMax,mu,passos);

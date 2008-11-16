@@ -129,7 +129,7 @@ public class aodv
 			mobility = new Mobility.UniformCircular(field, mobilityOpts,nodes);
 			break;
 		case Constants.MOBILITY_UNIFORM_RECT:
-			mobility = new Mobility.Uniforme(field, mobilityOpts,nodes);
+			mobility = null;//new Mobility.Uniforme(field, mobilityOpts,nodes);
 			break;
 		case Constants.MOBILITY_UNIFORM_RECT_NOMANDE:
 			mobility = new Mobility.GrupoUniforme(field, mobilityOpts);
