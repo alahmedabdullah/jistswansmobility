@@ -487,7 +487,7 @@ private static PrintStream statsfile;
           mobility = new Mobility.UniformCircular(opts.field, opts.mobilityOpts,opts.nodes);
           break;
       case Constants.MOBILITY_UNIFORM_RECT:
-          mobility = new Mobility.Uniforme(opts.field, opts.mobilityOpts,opts.nodes);
+          mobility = new Mobility.Uniforme(opts.field, opts.mobilityOpts);
           break;
       case Constants.MOBILITY_UNIFORM_RECT_NOMANDE:
           mobility = new Mobility.GrupoUniforme(opts.field, opts.mobilityOpts);
