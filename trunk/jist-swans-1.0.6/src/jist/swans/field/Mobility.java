@@ -778,7 +778,7 @@ public static class GrupoUniforme implements Mobility{
 	public void next(FieldInterface f, Integer id, Location loc, MobilityInfo info) {
 		GrupoUniformeInfo noinfo = (GrupoUniformeInfo) info;
 		if(id>=1 && id<=qtdpointReference){
-			JistAPI.sleep(tempoPausa*Constants.SECOND);
+			JistAPI.sleep((long)(tempoPausa*Constants.SECOND));
 			Location oldLoc = loc;
 			Location newLoc = moveNo(f, id, loc, noinfo);
 			double deltax =  newLoc.getX() - oldLoc.getX();
