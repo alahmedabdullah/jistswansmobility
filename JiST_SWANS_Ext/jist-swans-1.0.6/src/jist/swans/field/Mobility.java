@@ -230,7 +230,7 @@ public interface Mobility
               (float)(BORDER + (bounds.getX()-2*BORDER)*Constants.random.nextFloat()),
               (float)(BORDER + (bounds.getY()-2*BORDER)*Constants.random.nextFloat()));
           if(Main.ASSERT) Util.assertion(rwi.waypoint.inside(bounds));
-          float speed = minspeed + (maxspeed-minspeed) * (float)Constants.betarnd(2, 2);
+          float speed = minspeed + (maxspeed-minspeed) * (float)Constants.random.nextFloat();
           float dist = loc.distance(rwi.waypoint);
           rwi.steps = (int)StrictMath.max(StrictMath.floor(dist / precision),1);
           if(Main.ASSERT) Util.assertion(rwi.steps>0);
