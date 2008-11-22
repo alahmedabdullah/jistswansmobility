@@ -92,7 +92,7 @@ public class aodvsim
     /** Packet loss options. */
     private String lossOpts = "";
     /** Number of messages sent per minute per node. */
-    private double sendRate = 1.0;
+    private double sendRate = 60.0;
     /** Start of sending (seconds). */
     private int startTime = 60;
     /** Number of seconds to send messages. */

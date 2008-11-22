@@ -133,7 +133,8 @@ public class TransUdp implements TransInterface.TransUdpInterface
     /** {@inheritDoc} */
     public String toString()
     {
-      return "udp(srcPort="+srcPort+" dstPort="+dstPort+" data="+payload+")";
+     // return "udp(srcPort="+srcPort+" dstPort="+dstPort+" data="+payload+")";
+    	return "udp";
     }
 
     /** {@inheritDoc} */

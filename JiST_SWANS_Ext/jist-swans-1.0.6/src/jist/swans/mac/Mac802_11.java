@@ -1251,7 +1251,7 @@ public class Mac802_11 implements MacInterface.Mac802_11
         break;
       case MAC_MODE_SWFCTS:
       case MAC_MODE_SWFACK:
-      case MAC_MODE_XBROADCAST:
+  //    case MAC_MODE_XBROADCAST:
         retry();
         break;
       default:
