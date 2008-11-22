@@ -174,7 +174,7 @@ public abstract class AppCbrBase implements AppInterface, NetInterface.NetHandle
 		//System.out.println(JistUtils.getSimulationTime()+": "+ this.nodeId+" about to send "+this.packetsPerConnection+" to "+dst);
 		
 		// calc wait time between messages
-		long delay = Constants.MINUTE / this.sendRate;
+		long delay = Constants.SECOND / this.sendRate;
 				
 		for (int i=0; i < this.packetsPerConnection; i++) {
 			// create message

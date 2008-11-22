@@ -350,7 +350,7 @@ public class aodvsim_new
 
     
     // app
-    AppCbrIp app = new AppCbrIp(60,0,20,10,1,i,nodecount, duration);
+    AppCbrIp app = new AppCbrIp(60,2,20,10,5,i,nodecount, duration);
     if (statsApp == null) statsApp = app;
    
     // placement

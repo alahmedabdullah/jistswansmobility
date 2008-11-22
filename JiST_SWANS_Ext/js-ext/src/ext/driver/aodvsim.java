@@ -21,6 +21,7 @@ import jist.swans.field.PathLoss;
 import jist.swans.radio.RadioNoise;
 import jist.swans.radio.RadioNoiseIndep;
 import jist.swans.radio.RadioInfo;
+import jist.swans.mac.Mac802_11;
 import jist.swans.mac.MacAddress;
 import jist.swans.mac.MacDumb;
 import jist.swans.net.NetAddress;
@@ -309,7 +310,7 @@ public class aodvsim
     RadioNoise radio = new RadioNoiseIndep(i, radioInfo);
 
     // mac
-    MacDumb mac = new MacDumb(new MacAddress(i), radio.getRadioInfo());
+    Mac802_11 mac = new Mac802_11(new MacAddress(i), radio.getRadioInfo());
 
     // network
     final NetAddress address = new NetAddress(i);
