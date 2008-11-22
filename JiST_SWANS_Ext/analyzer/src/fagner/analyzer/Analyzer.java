@@ -25,13 +25,13 @@ public class Analyzer {
 	public static void main(String args[]) {
 		try {
 			buffer = new BufferedReader(new FileReader("NET.log"));
-			overhead(buffer);
+			//overhead(buffer);
 			buffer.close();
 			buffer = new BufferedReader(new FileReader("NET.log"));
-			delivery(buffer);
+			//delivery(buffer);
 			buffer.close();
 			buffer = new BufferedReader(new FileReader("NET.log"));
-			dropped(buffer);
+			//dropped(buffer);
 			buffer.close();
 			buffer = new BufferedReader(new FileReader("NET.log"));
 			delay(buffer);
@@ -50,17 +50,12 @@ public class Analyzer {
 		try {
 
 			
-			HashMap<Integer,String> idsPacotesSend  = new HashMap<Integer, String>();
+			HashMap<String,String> idsPacotesSend  = new HashMap<String, String>();
 
 			String line = buffer.readLine();
 
 			double sumDelay1=0,sumDelay2=0,sumDelay3=0,sumDelay4=0,sumDelay5=0;
 			int contDelay1=0,contDelay2=0,contDelay3=0,contDelay4=0,contDelay5=0;
-			String fonteSend =null;	
-			String destinoSend=null;
-			String fonteReceive =null;	
-			String destinoReceive=null;
-			String idPacoteSend = null;
 			
 			while ( line!= null)
 			{  
@@ -72,56 +67,58 @@ public class Analyzer {
 					if (evento.equals("NetIpBase:INFO:send")){
 						String tipoPacote = tokens[10];
 						if(tipoPacote.equals("data=udp)"))  {
-							String teste = tokens[8].substring(3);
-							idsPacotesSend.put(Integer.parseInt(teste),timeSTRSend[1]);	
+							String fonte = tokens[3].substring(12);
+							String destino = tokens[4].substring(4);
+							String idPacote = tokens[8].substring(3);
+							idsPacotesSend.put(idPacote+destino+fonte,timeSTRSend[1]);	
 						}
 					}
-					line = buffer.readLine();
-					if(line!=null){
-						tokens = line.split(" |\t");
-						evento = tokens[0]; 
-						String []timeSTRReceive = tokens[1].split("=");
-
+					else
+					{				
 						if (evento.equals("NetIpBase:INFO:receive")){
 							String tipoPacote = tokens[11];
 							if(tipoPacote.equals("data=udp)"))  {		
-								Integer idPacote = Integer.parseInt(tokens[9].substring(3));
-								if(idsPacotesSend.containsKey(idPacote)){	
+								String fonte = tokens[4].substring(12);
+								String destino = tokens[5].substring(4);
+								String idPacote = tokens[9].substring(3);
+								if(idsPacotesSend.containsKey(idPacote+destino+fonte)){	
 									String pacoteIDTime  = idsPacotesSend.get(idPacote);
-									double intervalo =Double.parseDouble(timeSTRReceive[1]) - Double.parseDouble(pacoteIDTime );	
+									double intervalo = time - Double.parseDouble(pacoteIDTime );	
 									sumDelay1+=intervalo;
 									contDelay1++;
 								}
 							}
 						}
+
 					}
 				}
 				if (time>550 && time<= 600){
 					if (evento.equals("NetIpBase:INFO:send")){
 						String tipoPacote = tokens[10];
 						if(tipoPacote.equals("data=udp)"))  {
-							String teste = tokens[8].substring(3);
-							idsPacotesSend.put(Integer.parseInt(teste),timeSTRSend[1]);	
+							String fonte = tokens[3].substring(12);
+							String destino = tokens[4].substring(4);
+							String idPacote = tokens[8].substring(3);
+							idsPacotesSend.put(idPacote+destino+fonte,timeSTRSend[1]);	
 						}
 					}
-					line = buffer.readLine();
-					if(line!=null){
-						tokens = line.split(" |\t");
-						evento = tokens[0]; 
-						String []timeSTRReceive = tokens[1].split("=");
-
+					else
+					{				
 						if (evento.equals("NetIpBase:INFO:receive")){
 							String tipoPacote = tokens[11];
 							if(tipoPacote.equals("data=udp)"))  {		
-								Integer idPacote = Integer.parseInt(tokens[9].substring(3));
-								if(idsPacotesSend.containsKey(idPacote)){	
+								String fonte = tokens[4].substring(12);
+								String destino = tokens[5].substring(4);
+								String idPacote = tokens[9].substring(3);
+								if(idsPacotesSend.containsKey(idPacote+destino+fonte)){	
 									String pacoteIDTime  = idsPacotesSend.get(idPacote);
-									double intervalo =Double.parseDouble(timeSTRReceive[1]) - Double.parseDouble(pacoteIDTime );	
+									double intervalo = time - Double.parseDouble(pacoteIDTime );	
 									sumDelay2+=intervalo;
 									contDelay2++;
 								}
 							}
 						}
+
 					}
 				}
 				
@@ -129,28 +126,29 @@ public class Analyzer {
 					if (evento.equals("NetIpBase:INFO:send")){
 						String tipoPacote = tokens[10];
 						if(tipoPacote.equals("data=udp)"))  {
-							String teste = tokens[8].substring(3);
-							idsPacotesSend.put(Integer.parseInt(teste),timeSTRSend[1]);	
+							String fonte = tokens[3].substring(12);
+							String destino = tokens[4].substring(4);
+							String idPacote = tokens[8].substring(3);
+							idsPacotesSend.put(idPacote+destino+fonte,timeSTRSend[1]);	
 						}
 					}
-					line = buffer.readLine();
-					if(line!=null){
-						tokens = line.split(" |\t");
-						evento = tokens[0]; 
-						String []timeSTRReceive = tokens[1].split("=");
-
+					else
+					{				
 						if (evento.equals("NetIpBase:INFO:receive")){
 							String tipoPacote = tokens[11];
 							if(tipoPacote.equals("data=udp)"))  {		
-								Integer idPacote = Integer.parseInt(tokens[9].substring(3));
-								if(idsPacotesSend.containsKey(idPacote)){	
+								String fonte = tokens[4].substring(12);
+								String destino = tokens[5].substring(4);
+								String idPacote = tokens[9].substring(3);
+								if(idsPacotesSend.containsKey(idPacote+destino+fonte)){	
 									String pacoteIDTime  = idsPacotesSend.get(idPacote);
-									double intervalo =Double.parseDouble(timeSTRReceive[1]) - Double.parseDouble(pacoteIDTime );	
+									double intervalo = time - Double.parseDouble(pacoteIDTime );	
 									sumDelay3+=intervalo;
 									contDelay3++;
 								}
 							}
 						}
+
 					}
 				}
 				
@@ -158,28 +156,29 @@ public class Analyzer {
 					if (evento.equals("NetIpBase:INFO:send")){
 						String tipoPacote = tokens[10];
 						if(tipoPacote.equals("data=udp)"))  {
-							String teste = tokens[8].substring(3);
-							idsPacotesSend.put(Integer.parseInt(teste),timeSTRSend[1]);	
+							String fonte = tokens[3].substring(12);
+							String destino = tokens[4].substring(4);
+							String idPacote = tokens[8].substring(3);
+							idsPacotesSend.put(idPacote+destino+fonte,timeSTRSend[1]);	
 						}
 					}
-					line = buffer.readLine();
-					if(line!=null){
-						tokens = line.split(" |\t");
-						evento = tokens[0]; 
-						String []timeSTRReceive = tokens[1].split("=");
-
+					else
+					{				
 						if (evento.equals("NetIpBase:INFO:receive")){
 							String tipoPacote = tokens[11];
 							if(tipoPacote.equals("data=udp)"))  {		
-								Integer idPacote = Integer.parseInt(tokens[9].substring(3));
-								if(idsPacotesSend.containsKey(idPacote)){	
+								String fonte = tokens[4].substring(12);
+								String destino = tokens[5].substring(4);
+								String idPacote = tokens[9].substring(3);
+								if(idsPacotesSend.containsKey(idPacote+destino+fonte)){	
 									String pacoteIDTime  = idsPacotesSend.get(idPacote);
-									double intervalo =Double.parseDouble(timeSTRReceive[1]) - Double.parseDouble(pacoteIDTime );	
+									double intervalo = time - Double.parseDouble(pacoteIDTime );	
 									sumDelay4+=intervalo;
 									contDelay4++;
 								}
 							}
 						}
+
 					}
 				}
 				
@@ -187,28 +186,29 @@ public class Analyzer {
 					if (evento.equals("NetIpBase:INFO:send")){
 						String tipoPacote = tokens[10];
 						if(tipoPacote.equals("data=udp)"))  {
-							String teste = tokens[8].substring(3);
-							idsPacotesSend.put(Integer.parseInt(teste),timeSTRSend[1]);	
+							String fonte = tokens[3].substring(12);
+							String destino = tokens[4].substring(4);
+							String idPacote = tokens[8].substring(3);
+							idsPacotesSend.put(idPacote+destino+fonte,timeSTRSend[1]);	
 						}
 					}
-					line = buffer.readLine();
-					if(line!=null){
-						tokens = line.split(" |\t");
-						evento = tokens[0]; 
-						String []timeSTRReceive = tokens[1].split("=");
-
+					else
+					{				
 						if (evento.equals("NetIpBase:INFO:receive")){
 							String tipoPacote = tokens[11];
 							if(tipoPacote.equals("data=udp)"))  {		
-								Integer idPacote = Integer.parseInt(tokens[9].substring(3));
-								if(idsPacotesSend.containsKey(idPacote)){	
+								String fonte = tokens[4].substring(12);
+								String destino = tokens[5].substring(4);
+								String idPacote = tokens[9].substring(3);
+								if(idsPacotesSend.containsKey(idPacote+destino+fonte)){	
 									String pacoteIDTime  = idsPacotesSend.get(idPacote);
-									double intervalo =Double.parseDouble(timeSTRReceive[1]) - Double.parseDouble(pacoteIDTime );	
+									double intervalo = time - Double.parseDouble(pacoteIDTime );	
 									sumDelay5+=intervalo;
 									contDelay5++;
 								}
 							}
 						}
+
 					}
 				}
 				
@@ -423,11 +423,11 @@ public class Analyzer {
 						cont1++;
 					if(time>550 && time<= 600)
 						cont2++;
-					if(time>650 && time<= 700)
+					if(time>600 && time<= 650)
 						cont3++;
-					if(time>700 && time<=750)
+					if(time>650 && time<=700)
 						cont4++;
-					if(time>750 && time<=800)
+					if(time>700 && time<=750)
 						cont5++;
 				}
 
