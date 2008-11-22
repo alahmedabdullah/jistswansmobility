@@ -210,6 +210,10 @@ public class aodvsim
         {
           cmdOpts.mobility = Constants.MOBILITY_WAYPOINT;
         }
+        else if(mobilityString.equalsIgnoreCase("uniform"))
+        {
+          cmdOpts.mobility = Constants.MOBILITY_UNIFORM;
+        }
         else if(mobilityString.equalsIgnoreCase("teleport"))
         {
           cmdOpts.mobility = Constants.MOBILITY_TELEPORT;
@@ -377,6 +381,9 @@ public class aodvsim
       case Constants.MOBILITY_WAYPOINT:
         mobility = new Mobility.RandomWaypoint(opts.field, opts.mobilityOpts);
         break;
+      case Constants.MOBILITY_UNIFORM:
+          mobility = new Mobility.Uniforme(opts.field, opts.mobilityOpts);
+          break;
       case Constants.MOBILITY_TELEPORT:
         mobility = new Mobility.Teleport(opts.field, Long.parseLong(opts.mobilityOpts));
         break;
