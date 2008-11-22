@@ -17,5 +17,4 @@
 	<classpathentry kind="lib" path="ssj/colt.jar"/>
 	<classpathentry kind="lib" path="ssj/optimization.jar"/>
 	<classpathentry kind="lib" path="ssj/ssj.jar"/>
-	<classpathentry kind="output" path="classes"/>
 </classpath>

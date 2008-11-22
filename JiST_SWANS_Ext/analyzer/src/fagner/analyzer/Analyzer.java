@@ -8,16 +8,16 @@ public class Analyzer {
 	public static void main(String args[]) {
 		try {
 			buffer = new BufferedReader(new FileReader("NET.log"));
-			overhead(buffer);
+			//overhead(buffer);
 			buffer.close();
 			buffer = new BufferedReader(new FileReader("NET.log"));
-			delivery(buffer);
+			//delivery(buffer);
 			buffer.close();
 			buffer = new BufferedReader(new FileReader("NET.log"));
-			dropped(buffer);
+			//dropped(buffer);
 			buffer.close();
 			buffer = new BufferedReader(new FileReader("NET.log"));
-			new Analyzer().delay(buffer);
+			new Analyzer().delay();
 			buffer.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -29,16 +29,46 @@ public class Analyzer {
 
 	}
 
-	private void delay(BufferedReader buffer) {
+	private void delay() {
+
+			System.out.println("Delay-UDP");
+			
+			Formatter fmt1 = new Formatter();
+			fmt1.format("%.8f", delayUnit(500, 550));
+			System.out.println(fmt1);
+			
+			Formatter fmt2 = new Formatter();
+			fmt2.format("%.8f", delayUnit(550, 600));
+			System.out.println(fmt2);
+			
+			Formatter fmt3 = new Formatter();
+			fmt3.format("%.8f", delayUnit(600, 650));
+			System.out.println(fmt3);
+			
+			Formatter fmt4 = new Formatter();	
+			fmt4.format("%.8f", delayUnit(650, 700));
+			System.out.println(fmt4);
+			
+			Formatter fmt5 = new Formatter();
+			fmt5.format("%.8f", delayUnit(700, 750));
+			System.out.println(fmt5);
+		
+		
+
+	}
+		
+	private double delayUnit(int timeInicial, int timeFinal) {
+		double sumDelay1=0,sumDelay2=0,sumDelay3=0,sumDelay4=0,sumDelay5=0;
+		int contDelay1=0,contDelay2=0,contDelay3=0,contDelay4=0,contDelay5=0;
+		System.gc();
 		try {
 
-			
+			BufferedReader buffer = new BufferedReader(new FileReader("NET.log"));
 			HashMap<String,String> idsPacotesSend  = new HashMap<String, String>();
 
 			String line = buffer.readLine();
 
-			double sumDelay1=0,sumDelay2=0,sumDelay3=0,sumDelay4=0,sumDelay5=0;
-			int contDelay1=0,contDelay2=0,contDelay3=0,contDelay4=0,contDelay5=0;
+			
 			int cont=0;
 
 			while ( line!= null)
@@ -50,7 +80,7 @@ public class Analyzer {
 					String []timeSTRSend = tokens[1].split("=");
 					Double  time = Double.parseDouble(timeSTRSend[1]);
 
-					if (time>500 && time<= 550){
+					if (time>timeInicial & time<= timeFinal){
 
 						String tipoPacote = tokens[10];
 						if(tipoPacote.equals("data=udp)"))  {
@@ -76,177 +106,22 @@ public class Analyzer {
 								double intervalo = time - Double.parseDouble(pacoteIDTime);	
 								sumDelay1+=intervalo;
 								contDelay1++;
+								idsPacotesSend.remove(key);
 							}
 						}
+
 					}
-
-				}
-				if (evento.equals("NetIpBase:INFO:send")){
-					String []timeSTRSend = tokens[1].split("=");
-					Double  time = Double.parseDouble(timeSTRSend[1]);
-
-					if (time>550 && time<= 600){
-
-						String tipoPacote = tokens[10];
-						if(tipoPacote.equals("data=udp)"))  {
-							String fonte = tokens[3].substring(12);
-							String destino = tokens[4].substring(4);
-							String idPacote = tokens[8].substring(3);
-							idsPacotesSend.put(idPacote+destino+fonte,timeSTRSend[1]);	
-						}
-					}
-				}else
-				{			
-					if (evento.equals("NetIpBase:INFO:receive")){
-						String tipoPacote = tokens[11];
-						String []timeSTRReceive = tokens[1].split("=");
-						Double  time = Double.parseDouble(timeSTRReceive[1]);
-						if(tipoPacote.equals("data=udp)"))  {		
-							String fonte = tokens[4].substring(12);
-							String destino = tokens[5].substring(4);
-							String idPacote = tokens[9].substring(3);
-							String key = idPacote+destino+fonte;
-							if(idsPacotesSend.containsKey(key)){	
-								String pacoteIDTime  = idsPacotesSend.get(key);
-								double intervalo = time - Double.parseDouble(pacoteIDTime);	
-								sumDelay2+=intervalo;
-								contDelay2++;
-							}
-						}
-					}
-
-				}
-				if (evento.equals("NetIpBase:INFO:send")){
-					String []timeSTRSend = tokens[1].split("=");
-					Double  time = Double.parseDouble(timeSTRSend[1]);
-
-					if (time>600 && time<= 650){
-
-						String tipoPacote = tokens[10];
-						if(tipoPacote.equals("data=udp)"))  {
-							String fonte = tokens[3].substring(12);
-							String destino = tokens[4].substring(4);
-							String idPacote = tokens[8].substring(3);
-							idsPacotesSend.put(idPacote+destino+fonte,timeSTRSend[1]);	
-						}
-					}
-				}else
-				{			
-					if (evento.equals("NetIpBase:INFO:receive")){
-						String tipoPacote = tokens[11];
-						String []timeSTRReceive = tokens[1].split("=");
-						Double  time = Double.parseDouble(timeSTRReceive[1]);
-						if(tipoPacote.equals("data=udp)"))  {		
-							String fonte = tokens[4].substring(12);
-							String destino = tokens[5].substring(4);
-							String idPacote = tokens[9].substring(3);
-							String key = idPacote+destino+fonte;
-							if(idsPacotesSend.containsKey(key)){	
-								String pacoteIDTime  = idsPacotesSend.get(key);
-								double intervalo = time - Double.parseDouble(pacoteIDTime);	
-								sumDelay3+=intervalo;
-								contDelay3++;
-							}
-						}
-					}
-
-				}
-				if (evento.equals("NetIpBase:INFO:send")){
-					String []timeSTRSend = tokens[1].split("=");
-					Double  time = Double.parseDouble(timeSTRSend[1]);
-
-					if (time>650 && time<= 700){
-
-						String tipoPacote = tokens[10];
-						if(tipoPacote.equals("data=udp)"))  {
-							String fonte = tokens[3].substring(12);
-							String destino = tokens[4].substring(4);
-							String idPacote = tokens[8].substring(3);
-							idsPacotesSend.put(idPacote+destino+fonte,timeSTRSend[1]);	
-						}
-					}
-				}else
-				{			
-					if (evento.equals("NetIpBase:INFO:receive")){
-						String tipoPacote = tokens[11];
-						String []timeSTRReceive = tokens[1].split("=");
-						Double  time = Double.parseDouble(timeSTRReceive[1]);
-						if(tipoPacote.equals("data=udp)"))  {		
-							String fonte = tokens[4].substring(12);
-							String destino = tokens[5].substring(4);
-							String idPacote = tokens[9].substring(3);
-							String key = idPacote+destino+fonte;
-							if(idsPacotesSend.containsKey(key)){	
-								String pacoteIDTime  = idsPacotesSend.get(key);
-								double intervalo = time - Double.parseDouble(pacoteIDTime);	
-								sumDelay4+=intervalo;
-								contDelay4++;
-							}
-						}
-					}
-
-				}
-				if (evento.equals("NetIpBase:INFO:send")){
-					String []timeSTRSend = tokens[1].split("=");
-					Double  time = Double.parseDouble(timeSTRSend[1]);
-
-					if (time>700 && time<= 750){
-
-						String tipoPacote = tokens[10];
-						if(tipoPacote.equals("data=udp)"))  {
-							String fonte = tokens[3].substring(12);
-							String destino = tokens[4].substring(4);
-							String idPacote = tokens[8].substring(3);
-							idsPacotesSend.put(idPacote+destino+fonte,timeSTRSend[1]);	
-						}
-					}
-				}else
-				{			
-					if (evento.equals("NetIpBase:INFO:receive")){
-						String tipoPacote = tokens[11];
-						String []timeSTRReceive = tokens[1].split("=");
-						Double  time = Double.parseDouble(timeSTRReceive[1]);
-						if(tipoPacote.equals("data=udp)"))  {		
-							String fonte = tokens[4].substring(12);
-							String destino = tokens[5].substring(4);
-							String idPacote = tokens[9].substring(3);
-							String key = idPacote+destino+fonte;
-							if(idsPacotesSend.containsKey(key)){	
-								String pacoteIDTime  = idsPacotesSend.get(key);
-								double intervalo = time - Double.parseDouble(pacoteIDTime);	
-								sumDelay5+=intervalo;
-								contDelay5++;
-							}
-						}
-					}
-
-				}
-			
-				
+				}				
 				line = buffer.readLine();
 			}
 
 			
-			System.out.println("Delay-UDP");
-			Formatter fmt1 = new Formatter();
-		    fmt1.format("%.8f", sumDelay1/contDelay1);
-			System.out.println(fmt1);
-			Formatter fmt2 = new Formatter();
-		    fmt2.format("%.8f", sumDelay2/contDelay2);
-			System.out.println(fmt2);
-			Formatter fmt3 = new Formatter();
-		    fmt3.format("%.8f", sumDelay3/contDelay3);
-			System.out.println(fmt3);
-			Formatter fmt4 = new Formatter();
-		    fmt4.format("%.8f", sumDelay4/contDelay4);
-			System.out.println(fmt4);
-			Formatter fmt5 = new Formatter();
-		    fmt5.format("%.8f", sumDelay5/contDelay5);
-			System.out.println(fmt5);
+			buffer.close();
 		}
 		catch (IOException e) {
 			System.err.println(e);
 		}
+		return sumDelay1/contDelay1;
 	}
 
 	
