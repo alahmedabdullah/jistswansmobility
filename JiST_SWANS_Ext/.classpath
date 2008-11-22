@@ -4,6 +4,7 @@
 	<classpathentry kind="src" output="js-ext/classes" path="js-ext/src"/>
 	<classpathentry kind="src" output="jist-swans-1.0.6/classes" path="jist-swans-1.0.6/src"/>
 	<classpathentry kind="src" output="ducks/classes" path="ducks/src"/>
+	<classpathentry kind="src" output="analyzer/classes" path="analyzer/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="jist-swans-1.0.6/libs/bsh.jar"/>
 	<classpathentry kind="lib" path="jist-swans-1.0.6/libs/checkstyle-all.jar"/>
