@@ -120,7 +120,7 @@ public class TransmissionRangeTest {
 
 		// Create nodes
 		Location.Location2D loc0 = new Location.Location2D(100,100);
-		Location.Location2D loc1 = new Location.Location2D(350,100);
+		Location.Location2D loc1 = new Location.Location2D(500,100);
 			
 		createNode(0, nodes, field, loc0, radioInfoShared, protMap, pl, pl);
 		createNode(1, nodes, field, loc1, radioInfoShared, protMap, pl, pl);

@@ -8,13 +8,13 @@ public class Analyzer {
 	public static void main(String args[]) {
 		try {
 			buffer = new BufferedReader(new FileReader("NET.log"));
-			//overhead(buffer);
+			overhead(buffer);
 			buffer.close();
 			buffer = new BufferedReader(new FileReader("NET.log"));
-			//delivery(buffer);
+			delivery(buffer);
 			buffer.close();
 			buffer = new BufferedReader(new FileReader("NET.log"));
-			//dropped(buffer);
+			dropped(buffer);
 			buffer.close();
 			buffer = new BufferedReader(new FileReader("NET.log"));
 			new Analyzer().delay();
@@ -52,6 +52,19 @@ public class Analyzer {
 			Formatter fmt5 = new Formatter();
 			fmt5.format("%.8f", delayUnit(700, 750));
 			System.out.println(fmt5);
+			
+			Formatter fmt6 = new Formatter();
+			fmt6.format("%.8f", delayUnit(750, 800));
+			System.out.println(fmt6);
+			
+			Formatter fmt7 = new Formatter();
+			fmt7.format("%.8f", delayUnit(800, 850));
+			System.out.println(fmt7);
+			
+			
+			Formatter fmt8 = new Formatter();
+			fmt8.format("%.8f", delayUnit(850, 900));
+			System.out.println(fmt8);
 		
 		
 
@@ -130,8 +143,8 @@ public class Analyzer {
 
 			String line = buffer.readLine();
 
-			int contS1=0,contS2=0,contS3=0,contS4=0,contS5=0;
-			int contR1=0,contR2=0,contR3=0,contR4=0,contR5=0;
+			int contS1=0,contS2=0,contS3=0,contS4=0,contS5=0,contS6=0,contS7=0,contS8=0;
+			int contR1=0,contR2=0,contR3=0,contR4=0,contR5=0,contR6=0,contR7=0,contR8=0;
 			int cont1=0,cont2=0;
 
 			while ( line!= null)
@@ -160,6 +173,12 @@ public class Analyzer {
 							contS4++;
 						if(time>700 && time<=750)
 							contS5++;
+						if(time>750 && time<=800)
+							contS6++;
+						if(time>800 && time<=850)
+							contS7++;
+						if(time>850 && time<=900)
+							contS8++;
 
 					}
 				}
@@ -178,6 +197,12 @@ public class Analyzer {
 							contR4++;
 						if(time>700 && time<=750)
 							contR5++;
+						if(time>750 && time<=800)
+							contR6++;
+						if(time>800 && time<=850)
+							contR7++;
+						if(time>850 && time<=900)
+							contR8++;
 					}
 				}
 
@@ -187,16 +212,14 @@ public class Analyzer {
 
 			System.out.println("Dropped-UDP");
 
-			if (contS1!=0)
 				System.out.println(contS1-contR1);
-			if (contS2!=0)
 				System.out.println(contS2-contR2);
-			if (contS3!=0)
 				System.out.println(contS3-contR3);
-			if (contS4!=0)
 				System.out.println(contS4-contR4);
-			if (contS5!=0)
 				System.out.println(contS5-contR5);
+				System.out.println(contS6-contR6);
+				System.out.println(contS7-contR7);
+				System.out.println(contS8-contR8);
 
 
 		}
@@ -211,8 +234,8 @@ public class Analyzer {
 
 			String line = buffer.readLine();
 
-			int contS1=0,contS2=0,contS3=0,contS4=0,contS5=0;
-			int contR1=0,contR2=0,contR3=0,contR4=0,contR5=0;
+			int contS1=0,contS2=0,contS3=0,contS4=0,contS5=0,contS6=0,contS7=0,contS8=0;
+			int contR1=0,contR2=0,contR3=0,contR4=0,contR5=0,contR6=0,contR7=0,contR8=0;
 			int cont1=0,cont2=0;
 
 			while ( line!= null)
@@ -241,6 +264,12 @@ public class Analyzer {
 							contS4++;
 						if(time>700 && time<=750)
 							contS5++;
+						if(time>750 && time<=800)
+							contS6++;
+						if(time>800 && time<=850)
+							contS7++;
+						if(time>850 && time<=900)
+							contS8++;
 
 					}
 				}
@@ -259,6 +288,12 @@ public class Analyzer {
 							contR4++;
 						if(time>700 && time<=750)
 							contR5++;
+						if(time>750 && time<=800)
+							contR6++;
+						if(time>800 && time<=850)
+							contR7++;
+						if(time>850 && time<=900)
+							contR8++;
 					}
 				}
 
@@ -278,6 +313,12 @@ public class Analyzer {
 				System.out.println((double)contR4/contS4);
 			if (contS5!=0)
 				System.out.println((double)contR5/contS5);
+			if (contS6!=0)
+				System.out.println((double)contR6/contS6);
+			if (contS7!=0)
+				System.out.println((double)contR7/contS7);
+			if (contS8!=0)
+				System.out.println((double)contR8/contS8);
 
 
 		}
@@ -292,7 +333,7 @@ public class Analyzer {
 
 			String line = buffer.readLine();
 
-			int cont1=0,cont2=0,cont3=0,cont4=0,cont5=0;
+			int cont1=0,cont2=0,cont3=0,cont4=0,cont5=0,cont6=0,cont7=0,cont8=0;
 			while ( line!= null)
 			{  
 				String []tokens = line.split(" |\t");
@@ -301,7 +342,7 @@ public class Analyzer {
 
 				String tipoPacote = tokens[10];
 
-				if(evento.equals("NetIpBase:INFO:send") && (tipoPacote.equals("data=RREQ)")||tipoPacote.equals("data=RREP)")||tipoPacote.equals("data=RERR)")||tipoPacote.equals("data=HELLO)")))
+				if(evento.equals("NetIpBase:INFO:send") & (tipoPacote.equals("data=RREQ)")||tipoPacote.equals("data=RREP)")||tipoPacote.equals("data=RERR)")||tipoPacote.equals("data=HELLO)")))
 				{
 					Double  time = Double.parseDouble(timeSTR[1]);
 
@@ -315,6 +356,12 @@ public class Analyzer {
 						cont4++;
 					if(time>700 && time<=750)
 						cont5++;
+					if(time>750 && time<=800)
+						cont6++;
+					if(time>800 && time<=850)
+						cont7++;
+					if(time>850 && time<=900)
+						cont8++;
 				}
 
 				line = buffer.readLine();
@@ -326,6 +373,9 @@ public class Analyzer {
 			System.out.println(cont3);
 			System.out.println(cont4);
 			System.out.println(cont5);
+			System.out.println(cont6);
+			System.out.println(cont7);
+			System.out.println(cont8);
 
 		}
 		catch (IOException e) {

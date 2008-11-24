@@ -32,6 +32,7 @@ import jist.swans.net.PacketLoss;
 import jist.swans.trans.TransUdp;
 import jist.swans.route.RouteInterface;
 import jist.swans.route.RouteAodv;
+import jist.swans.misc.MessageBytes;
 import jist.swans.misc.Util;
 import jist.swans.misc.Mapper;
 import jist.swans.misc.Location;
@@ -93,7 +94,7 @@ public class aodvsim
     /** Packet loss options. */
     private String lossOpts = "";
     /** Number of messages sent per minute per node. */
-    private double sendRate = 60.0;
+    private double sendRate = 144.0;
     /** Start of sending (seconds). */
     private int startTime = 60;
     /** Number of seconds to send messages. */
@@ -411,7 +412,7 @@ public class aodvsim
     }
     if(opts.wrapField) spatial = new Spatial.TiledWraparound(spatial);
     // initialize field
-    Field field = new Field(spatial, new Fading.None(), new PathLoss.FreeSpace(), 
+    Field field = new Field(spatial, new Fading.None(), new PathLoss.TwoRay(), 
         mobility, Constants.PROPAGATION_LIMIT_DEFAULT);
     // initialize shared radio information
     RadioInfo.RadioInfoShared radioInfo = RadioInfo.createShared(
@@ -476,7 +477,7 @@ public class aodvsim
       } while (destIdx == srcIdx);
       RouteAodv srcAodv = (RouteAodv)routers.elementAt(srcIdx);
       RouteAodv destAodv = (RouteAodv)routers.elementAt(destIdx);
-      TransUdp.UdpMessage udpMsg = new TransUdp.UdpMessage(PORT, PORT, Message.NULL);
+      TransUdp.UdpMessage udpMsg = new TransUdp.UdpMessage(PORT, PORT, new MessageBytes(new byte[64]));
       NetMessage msg = new NetMessage.Ip(udpMsg, srcAodv.getLocalAddr(), destAodv.getLocalAddr(), 
           Constants.NET_PROTOCOL_UDP, Constants.NET_PRIORITY_NORMAL, Constants.TTL_DEFAULT);
       srcAodv.getProxy().send(msg);
